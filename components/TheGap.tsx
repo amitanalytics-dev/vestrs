@@ -114,7 +114,7 @@ export default function TheGap() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.12 }}
               whileHover={{ y: -3 }}
-              className={`bg-white/[0.04] ${p.borderClass} border border-white/[0.08] rounded-2xl p-8 hover:bg-white/[0.07] hover:border-white/[0.14] transition-all duration-300`}
+              className={`flex flex-col bg-white/[0.04] ${p.borderClass} border border-white/[0.08] rounded-2xl p-8 hover:bg-white/[0.07] hover:border-white/[0.14] transition-all duration-300`}
             >
               <div className={`inline-flex px-2 py-1 rounded-lg text-xs font-black mb-5 bg-white/[0.07] ${p.labelClass}`}>
                 {p.number}
@@ -150,7 +150,7 @@ export default function TheGap() {
                 ))}
               </div>
 
-              <div className="border-t border-white/8 pt-4">
+              <div className="mt-auto border-t border-white/8 pt-4">
                 <p className="text-slate-300 text-sm italic font-medium">{p.closer}</p>
               </div>
             </motion.div>
