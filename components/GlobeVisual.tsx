@@ -55,6 +55,34 @@ const UNICORNS: [string, string, string, string, string, number, number][] = [
   ['OneCard',     'Fintech',    'Matrix India',     '12x',  '#ef4444', 18.52, 73.86],
 ]
 
+const DOMAINS: Record<string, string> = {
+  'Flipkart': 'flipkart.com',     'Paytm': 'paytm.com',
+  'Ola': 'olacabs.com',           "BYJU'S": 'byjus.com',
+  'Dream11': 'dream11.com',       'Swiggy': 'swiggy.com',
+  'Zomato': 'zomato.com',         'Razorpay': 'razorpay.com',
+  'CRED': 'cred.club',            'Meesho': 'meesho.com',
+  'Nykaa': 'nykaa.com',           'PolicyBazaar': 'policybazaar.com',
+  'PhonePe': 'phonepe.com',       'Groww': 'groww.in',
+  'Zepto': 'zepto.in',            'BharatPe': 'bharatpe.com',
+  'Unacademy': 'unacademy.com',   'Vedantu': 'vedantu.com',
+  'ShareChat': 'sharechat.com',   'Slice': 'sliceit.app',
+  'Darwinbox': 'darwinbox.com',   'Chargebee': 'chargebee.com',
+  'Freshworks': 'freshworks.com', 'InMobi': 'inmobi.com',
+  'Udaan': 'udaan.com',           'Moglix': 'moglix.com',
+  'Lenskart': 'lenskart.com',     'MakeMyTrip': 'makemytrip.com',
+  'MPL': 'mpl.live',              'Spinny': 'spinny.com',
+  'Acko': 'acko.com',             'OfBusiness': 'ofbusiness.in',
+  'Infra.Market': 'infra.market', 'Fractal': 'fractal.ai',
+  'Mensa Brands': 'mensabrands.com', 'GlobalBees': 'globalbees.com',
+  'Pristyn Care': 'pristyncare.com', 'PharmEasy': 'pharmeasy.in',
+  'NoBroker': 'nobroker.com',     'BlackBuck': 'blackbuck.com',
+  'Open Fin.': 'open.money',      'XpressBees': 'xpressbees.com',
+  'Zetwerk': 'zetwerk.com',       'LeadSquared': 'leadsquared.com',
+  'Amagi': 'amagi.tv',            'Rapido': 'rapido.bike',
+  'Stanza': 'stanzaliving.com',   'DealShare': 'dealshare.in',
+  'Droom': 'droom.in',            'OneCard': 'getonecard.app',
+}
+
 const HQ_CITIES = [
   { name: 'Bangalore', lat: 12.97, lng: 77.59 },
   { name: 'Mumbai',    lat: 19.08, lng: 72.88 },
@@ -65,8 +93,6 @@ const HQ_CITIES = [
 ]
 
 const IR = 3.334
-const SMIN = IR - 0.08
-const SMAX = IR + 0.08
 const GROUP_DUR = 4000
 const FADE_DUR  = 600
 
@@ -92,6 +118,17 @@ export default function GlobeVisual() {
     const container = mountRef.current
     if (!container) return
     let animId = 0
+
+    // Pre-load favicons for all companies
+    const logoImgs = new Map<string, HTMLImageElement>()
+    UNICORNS.forEach(u => {
+      const domain = DOMAINS[u[0]]
+      if (!domain) return
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => logoImgs.set(u[0], img)
+      img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+    })
 
     const cv = document.createElement('canvas')
     Object.assign(cv.style, { position: 'absolute', top: '0', left: '0', display: 'block' })
@@ -122,12 +159,7 @@ export default function GlobeVisual() {
       camera.lookAt(0, 0.58, 0)
       let targetZ = 2.05
 
-      // Stars
-      const sp = new Float32Array(3000 * 3)
-      for (let i = 0; i < sp.length; i++) sp[i] = (Math.random() - 0.5) * 200
-      const sg = new THREE.BufferGeometry()
-      sg.setAttribute('position', new THREE.BufferAttribute(sp, 3))
-      scene.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.11 })))
+      // No star field — hero section provides the stars for visual unity
 
       const gg = new THREE.Group()
       scene.add(gg)
@@ -163,7 +195,7 @@ export default function GlobeVisual() {
         )
       }
 
-      // Persistent city dots on the 3D globe
+      // Persistent city dots on 3D globe
       HQ_CITIES.forEach(c => {
         const pos = ll(c.lat, c.lng, 1.013)
         const dot = new THREE.Mesh(
@@ -174,12 +206,11 @@ export default function GlobeVisual() {
         gg.add(dot)
       })
 
-      // India-centred with tiny wobble + tilt
-      let sDir = 1
+      // India fixed centre — no auto-rotation
       gg.rotation.y = IR
       gg.rotation.x = 0.28
 
-      // Interaction
+      // Drag interaction only (no auto-spin)
       let drag = false
       const pM = { x: 0, y: 0 }
       const vel = { x: 0, y: 0 }
@@ -197,11 +228,7 @@ export default function GlobeVisual() {
         vel.x = dy * 0.0004; vel.y = dx * 0.0004
         pM.x = e.clientX; pM.y = e.clientY
       }
-      const onMouseUp = () => {
-        drag = false; container.style.cursor = 'grab'
-        if (gg.rotation.y > SMAX) sDir = -1
-        else if (gg.rotation.y < SMIN) sDir = 1
-      }
+      const onMouseUp = () => { drag = false; container.style.cursor = 'grab' }
       const onWheel = (e: WheelEvent) => {
         e.preventDefault()
         targetZ = Math.max(1.6, Math.min(2.8, targetZ + e.deltaY * 0.003))
@@ -248,7 +275,7 @@ export default function GlobeVisual() {
         // Pulsing halo
         const pulse = 0.5 + 0.5 * Math.sin(now * 0.005 + compIdx * 1.5)
         ctx2.save()
-        ctx2.globalAlpha = alpha * 0.3
+        ctx2.globalAlpha = alpha * 0.28
         ctx2.beginPath(); ctx2.arc(px, py, 4 + pulse * 5, 0, Math.PI * 2)
         ctx2.fillStyle = u[4]; ctx2.fill()
         ctx2.restore()
@@ -256,70 +283,96 @@ export default function GlobeVisual() {
         // Solid dot
         ctx2.save()
         ctx2.globalAlpha = alpha
-        ctx2.beginPath(); ctx2.arc(px, py, 4, 0, Math.PI * 2)
+        ctx2.beginPath(); ctx2.arc(px, py, 4.5, 0, Math.PI * 2)
         ctx2.fillStyle = u[4]; ctx2.fill()
-        ctx2.strokeStyle = 'rgba(255,255,255,0.6)'; ctx2.lineWidth = 1; ctx2.stroke()
+        ctx2.strokeStyle = 'rgba(255,255,255,0.7)'; ctx2.lineWidth = 1.2; ctx2.stroke()
         ctx2.restore()
 
-        const CW = 155, CH = 50
+        const CW = 168, CH = 54
         const offX = compIdx === 0 ? 14 : -(CW + 14)
         const offY = compIdx === 0 ? -(CH * 0.7) : -(CH * 0.3)
         let cx = px + offX, cy = py + offY
 
-        if (cx < 4)       cx = 4
-        if (cx + CW > W - 4) cx = W - CW - 4
-        if (cy < 4)       cy = 4
-        if (cy + CH > H - 4) cy = H - CH - 4
+        if (cx < 4)           cx = 4
+        if (cx + CW > W - 4)  cx = W - CW - 4
+        if (cy < 4)           cy = 4
+        if (cy + CH > H - 4)  cy = H - CH - 4
 
         // Dashed connector
         ctx2.save()
         ctx2.globalAlpha = alpha * 0.55
         ctx2.strokeStyle = '#FF9933'; ctx2.lineWidth = 1
         ctx2.setLineDash([3, 3])
-        const lineAnchorX = compIdx === 0 ? cx : cx + CW
-        ctx2.beginPath(); ctx2.moveTo(px, py); ctx2.lineTo(lineAnchorX, cy + CH / 2); ctx2.stroke()
+        const anchorX = compIdx === 0 ? cx : cx + CW
+        ctx2.beginPath(); ctx2.moveTo(px, py); ctx2.lineTo(anchorX, cy + CH / 2); ctx2.stroke()
         ctx2.restore()
 
-        // Card bg + accent bar
+        // Card background
         ctx2.save()
-        ctx2.globalAlpha = alpha * 0.88
-        ctx2.fillStyle = '#040c1e'
-        ctx2.fillRect(cx, cy, CW, CH)
-        ctx2.globalAlpha = alpha * 0.7
+        ctx2.globalAlpha = alpha * 0.92
+        ctx2.fillStyle = '#050e20'
+        // Rounded rect
+        const r = 5
+        ctx2.beginPath()
+        ctx2.moveTo(cx + r, cy)
+        ctx2.lineTo(cx + CW - r, cy); ctx2.arcTo(cx + CW, cy, cx + CW, cy + r, r)
+        ctx2.lineTo(cx + CW, cy + CH - r); ctx2.arcTo(cx + CW, cy + CH, cx + CW - r, cy + CH, r)
+        ctx2.lineTo(cx + r, cy + CH); ctx2.arcTo(cx, cy + CH, cx, cy + CH - r, r)
+        ctx2.lineTo(cx, cy + r); ctx2.arcTo(cx, cy, cx + r, cy, r)
+        ctx2.closePath()
+        ctx2.fill()
+        // Left accent bar (rounded on left)
+        ctx2.globalAlpha = alpha * 0.8
         ctx2.fillStyle = u[4]
-        ctx2.fillRect(cx, cy, 3, CH)
+        ctx2.beginPath()
+        ctx2.moveTo(cx + r, cy); ctx2.lineTo(cx + 4, cy)
+        ctx2.arcTo(cx, cy, cx, cy + r, r)
+        ctx2.lineTo(cx, cy + CH - r); ctx2.arcTo(cx, cy + CH, cx + r, cy + CH, r)
+        ctx2.lineTo(cx + 4, cy + CH); ctx2.lineTo(cx + 4, cy)
+        ctx2.closePath()
+        ctx2.fill()
         ctx2.restore()
-
-        const lr = 13
-        ctx2.save()
-        ctx2.globalAlpha = alpha
 
         // Logo circle
-        ctx2.beginPath(); ctx2.arc(cx + lr + 7, cy + CH / 2, lr, 0, Math.PI * 2)
+        const lr = 14
+        const lx = cx + lr + 8, ly = cy + CH / 2
+        ctx2.save()
+        ctx2.globalAlpha = alpha
+        ctx2.beginPath(); ctx2.arc(lx, ly, lr, 0, Math.PI * 2)
         ctx2.fillStyle = u[4]; ctx2.fill()
-        ctx2.font = 'bold 11px system-ui,sans-serif'
-        ctx2.fillStyle = '#fff'; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'
-        ctx2.shadowBlur = 0
-        ctx2.fillText(u[0].charAt(0), cx + lr + 7, cy + CH / 2)
+
+        const logoImg = logoImgs.get(u[0])
+        if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
+          // Clip to circle and draw favicon
+          ctx2.save()
+          ctx2.beginPath(); ctx2.arc(lx, ly, lr - 1, 0, Math.PI * 2); ctx2.clip()
+          ctx2.drawImage(logoImg, lx - (lr - 1), ly - (lr - 1), (lr - 1) * 2, (lr - 1) * 2)
+          ctx2.restore()
+        } else {
+          ctx2.font = `bold ${Math.round(lr * 0.85)}px system-ui,sans-serif`
+          ctx2.fillStyle = '#fff'; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'
+          ctx2.shadowBlur = 0
+          ctx2.fillText(u[0].charAt(0), lx, ly)
+        }
 
         // Company name
         const tx = cx + lr * 2 + 14
-        ctx2.font = '600 10.5px system-ui,sans-serif'
+        ctx2.font = '600 11px system-ui,sans-serif'
         ctx2.fillStyle = '#FF9933'; ctx2.textAlign = 'left'; ctx2.textBaseline = 'alphabetic'
-        ctx2.shadowColor = '#000'; ctx2.shadowBlur = 3
-        ctx2.fillText(u[0], tx, cy + 19)
+        ctx2.shadowColor = '#000'; ctx2.shadowBlur = 4
+        ctx2.fillText(u[0], tx, cy + 20)
 
         // Industry
-        ctx2.font = '8.5px system-ui,sans-serif'
-        ctx2.fillStyle = 'rgba(255,255,255,0.42)'; ctx2.shadowBlur = 0
-        ctx2.fillText(u[1], tx, cy + 31)
+        ctx2.font = '9px system-ui,sans-serif'
+        ctx2.fillStyle = 'rgba(255,255,255,0.45)'; ctx2.shadowBlur = 0
+        ctx2.fillText(u[1], tx, cy + 33)
 
-        // Multiple (right, glowing)
-        ctx2.font = 'bold 13px system-ui,sans-serif'
+        // Multiple — vertically centred, right-aligned, coloured glow
+        ctx2.font = 'bold 14px system-ui,sans-serif'
         ctx2.fillStyle = mColor(u[3])
-        ctx2.shadowColor = mColor(u[3]); ctx2.shadowBlur = 8
+        ctx2.shadowColor = mColor(u[3]); ctx2.shadowBlur = 10
         ctx2.textAlign = 'right'
-        ctx2.fillText(u[3], cx + CW - 5, cy + 34)
+        ctx2.fillText(u[3], cx + CW - 8, cy + CH / 2 + 5)
 
         ctx2.restore()
       }
@@ -329,9 +382,8 @@ export default function GlobeVisual() {
         gg.updateMatrixWorld()
         const camDir = camera.position.clone().normalize()
 
-        const now2   = performance.now()
-        const total2 = now2 - tStart
-        const gIdx   = Math.floor(total2 / GROUP_DUR) % GROUPS.length
+        const now2    = performance.now(), total2 = now2 - tStart
+        const gIdx    = Math.floor(total2 / GROUP_DUR) % GROUPS.length
         const elapsed = total2 % GROUP_DUR
         let alpha = elapsed < FADE_DUR
           ? elapsed / FADE_DUR
@@ -354,12 +406,11 @@ export default function GlobeVisual() {
 
       const animate = () => {
         animId = requestAnimationFrame(animate)
+        // Dampen drag velocity only — no auto-rotation
         if (!drag && !pTouch) {
-          gg.rotation.y += 0.0008 * sDir + vel.y
+          gg.rotation.y += vel.y
           gg.rotation.x = Math.max(0.12, Math.min(0.45, gg.rotation.x + vel.x))
-          vel.x *= 0.95; vel.y *= 0.95
-          if (gg.rotation.y >= SMAX) { gg.rotation.y = SMAX; sDir = -1; vel.y = 0 }
-          else if (gg.rotation.y <= SMIN) { gg.rotation.y = SMIN; sDir = 1; vel.y = 0 }
+          vel.x *= 0.92; vel.y *= 0.92
         }
         camera.position.z += (targetZ - camera.position.z) * 0.1
         renderer.render(scene, camera)
