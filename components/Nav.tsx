@@ -35,9 +35,14 @@ export default function Nav() {
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <div className="text-xl font-bold tracking-tight flex-shrink-0">
-          <span className="text-white">Vestrs</span>
-          <span className="text-gradient-teal">.</span>
+        <div className="flex flex-col flex-shrink-0">
+          <div className="text-xl font-bold tracking-tight leading-none">
+            <span className="text-white">Vestrs</span>
+            <span className="text-gradient-teal">.</span>
+          </div>
+          <span className="text-[9px] text-slate-500 tracking-[0.12em] uppercase mt-0.5 leading-none">
+            Global Capital · Indian Determination
+          </span>
         </div>
 
         {/* Desktop links */}

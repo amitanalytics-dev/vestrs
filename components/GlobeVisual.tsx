@@ -1,333 +1,272 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { useMemo } from 'react'
+import { useEffect, useRef } from 'react'
 
-const W = 500
-const H = 500
-const CX = W / 2
-const CY = H / 2
-const R = 220
+const CITIES = [
+  { name: 'San Francisco', lat: 37.77,  lon: -122.42 },
+  { name: 'New York',      lat: 40.71,  lon: -74.01  },
+  { name: 'London',        lat: 51.51,  lon: -0.13   },
+  { name: 'Dubai',         lat: 25.20,  lon: 55.27   },
+  { name: 'Singapore',     lat: 1.35,   lon: 103.82  },
+]
+const INDIA = { lat: 20.59, lon: 78.96 }
 
-const INDIA = { x: 288, y: 222 }
+function ll2xyz(lat: number, lon: number, r: number): [number, number, number] {
+  const phi   = (90 - lat) * (Math.PI / 180)
+  const theta = (lon + 180) * (Math.PI / 180)
+  return [
+    -r * Math.sin(phi) * Math.cos(theta),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta),
+  ]
+}
 
-const SOURCES = [
-  { x: 42,  y: 205, label: 'San Francisco' },
-  { x: 62,  y: 232, label: 'New York' },
-  { x: 118, y: 140, label: 'London' },
-  { x: 252, y: 158, label: 'Dubai' },
-  { x: 332, y: 288, label: 'Singapore' },
+// Continent outlines as [lat, lon] closed polygons
+const CONTINENT_LINES: [number, number][][] = [
+  // North America
+  [[70,-140],[60,-140],[55,-130],[50,-125],[40,-124],[35,-121],[30,-116],[25,-110],[20,-105],[15,-90],[10,-85],[8,-77],[10,-75],[15,-85],[20,-90],[25,-90],[30,-90],[33,-91],[35,-90],[40,-80],[45,-76],[50,-70],[55,-60],[60,-64],[65,-64],[70,-80],[75,-90],[75,-100],[75,-110],[75,-120],[75,-130],[75,-135],[70,-140]],
+  // South America
+  [[10,-75],[5,-77],[0,-78],[-5,-81],[-10,-78],[-15,-75],[-20,-70],[-25,-70],[-30,-71],[-35,-72],[-40,-73],[-45,-74],[-50,-73],[-55,-68],[-55,-65],[-50,-65],[-45,-64],[-40,-62],[-35,-58],[-30,-52],[-25,-48],[-20,-41],[-15,-39],[-10,-37],[-5,-35],[0,-50],[5,-52],[10,-60],[10,-65],[10,-75]],
+  // Europe
+  [[35,27],[40,28],[42,28],[44,30],[46,30],[48,32],[50,30],[52,23],[54,18],[56,14],[58,11],[60,5],[62,5],[64,14],[66,14],[68,16],[70,20],[70,26],[68,28],[65,26],[62,24],[60,25],[58,22],[55,21],[53,20],[52,16],[50,14],[48,16],[46,14],[44,12],[42,12],[40,18],[38,15],[36,14],[35,12],[35,10],[36,8],[38,8],[40,2],[42,3],[44,0],[44,-1],[43,-9],[42,-8],[40,-8],[38,-8],[37,-9],[36,-6],[36,2],[37,4],[38,8],[40,8],[38,12],[36,12],[35,27]],
+  // Africa
+  [[37,10],[35,11],[33,12],[30,31],[22,37],[15,42],[12,44],[11,43],[10,42],[8,40],[5,40],[0,42],[-5,40],[-10,40],[-15,35],[-20,34],[-25,32],[-30,30],[-34,26],[-34,18],[-30,17],[-25,15],[-20,13],[-15,12],[-10,15],[-5,10],[0,9],[5,1],[5,-1],[4,-9],[5,-15],[8,-16],[10,-15],[12,-16],[14,-17],[16,-16],[18,-16],[20,-17],[22,-17],[24,-15],[26,-15],[28,-13],[30,-12],[32,-12],[33,-7],[33,0],[32,3],[30,10],[28,14],[25,25],[22,30],[20,37],[18,38],[15,40],[12,43],[10,42],[8,38],[5,35],[5,40],[37,10]],
+  // Asia main body
+  [[70,30],[68,40],[65,50],[60,60],[55,60],[50,58],[45,60],[40,60],[35,60],[30,60],[25,57],[22,59],[20,58],[18,55],[15,50],[12,45],[10,45],[8,44],[10,42],[15,42],[22,37],[30,31],[33,35],[36,36],[38,42],[40,50],[42,48],[44,50],[46,48],[48,58],[50,58],[52,60],[54,58],[56,60],[58,58],[60,58],[65,57],[70,55],[72,70],[68,80],[62,90],[55,90],[50,90],[45,90],[40,90],[35,90],[30,100],[25,100],[20,100],[15,102],[10,104],[5,102],[0,108],[5,115],[10,120],[15,120],[18,110],[20,110],[22,114],[25,120],[28,121],[30,122],[32,118],[35,120],[38,140],[40,140],[42,138],[44,135],[48,135],[50,140],[52,140],[55,132],[58,130],[60,130],[62,170],[65,170],[68,180],[70,170],[72,180],[75,160],[78,140],[80,120],[82,100],[82,80],[80,60],[78,40],[75,30],[70,30]],
+  // Australia
+  [[-15,128],[-16,122],[-20,114],[-25,113],[-30,115],[-35,117],[-38,146],[-40,148],[-35,150],[-30,153],[-25,153],[-20,148],[-15,145],[-12,142],[-12,136],[-15,130],[-15,128]],
 ]
 
-function bezierPoints(sx: number, sy: number, count = 30) {
-  const mx = (sx + INDIA.x) / 2
-  const my = Math.min(sy, INDIA.y) - 75
-  const pts = []
-  for (let i = 0; i <= count; i++) {
-    const t = i / count
-    const x = (1 - t) * (1 - t) * sx + 2 * (1 - t) * t * mx + t * t * INDIA.x
-    const y = (1 - t) * (1 - t) * sy + 2 * (1 - t) * t * my + t * t * INDIA.y
-    pts.push({ x, y })
-  }
-  return pts
-}
-
-function arcPath(sx: number, sy: number): string {
-  const mx = (sx + INDIA.x) / 2
-  const my = Math.min(sy, INDIA.y) - 75
-  return `M ${sx} ${sy} Q ${mx} ${my} ${INDIA.x} ${INDIA.y}`
-}
-
-function FlowLine({ sx, sy, delay }: { sx: number; sy: number; delay: number }) {
-  const pts = useMemo(() => bezierPoints(sx, sy), [sx, sy])
-  const xKeys = pts.map(p => p.x)
-  const yKeys = pts.map(p => p.y)
-  const path = arcPath(sx, sy)
-  return (
-    <g>
-      <path d={path} stroke="#0FFFC1" strokeWidth="1" fill="none" opacity={0.18} />
-      <motion.circle
-        r={3} fill="#0FFFC1"
-        animate={{ x: xKeys, y: yKeys }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'linear', delay, repeatDelay: 0.6 }}
-      />
-    </g>
-  )
-}
-
-function LatLine({ lat }: { lat: number }) {
-  const ry = R * Math.cos((lat * Math.PI) / 180)
-  const y = CY - R * Math.sin((lat * Math.PI) / 180)
-  if (Math.abs(ry) < 5) return null
-  return (
-    <ellipse cx={CX} cy={y} rx={ry} ry={ry * 0.18}
-      stroke="#163a52" strokeWidth="0.6" fill="none" />
-  )
-}
-
-// Physical map continent paths — India-centric Eastern Hemisphere view.
-// Colours: ocean #031828, land #0f3248, India teal.
-const LAND = [
-  // Russia + Siberia + Central Asia (top band)
-  {
-    id: 'eurasia',
-    d: `M 68 105
-        C 100 82 155 70 220 68
-        C 285 66 345 76 388 96
-        C 415 110 420 120 408 128
-        C 388 128 365 118 330 112
-        C 295 107 258 104 220 106
-        C 182 107 145 112 112 118
-        C 90 122 72 128 68 128 Z`,
-  },
-  // Scandinavia / UK peninsula hint
-  {
-    id: 'scandinavia',
-    d: `M 95 96 C 105 88 118 86 126 92 C 130 98 126 106 118 108
-        C 110 106 98 102 95 96 Z`,
-  },
-  // Europe (Iberia → France → UK → Balkans)
-  {
-    id: 'europe',
-    d: `M 68 128
-        C 80 112 98 105 120 104
-        C 140 104 156 110 162 120
-        C 164 126 160 130 152 133
-        C 140 137 122 140 104 138
-        C 86 135 68 128 68 128 Z`,
-  },
-  // Anatolia + Caucasus + Iran (Europe → Arabia bridge)
-  {
-    id: 'anatolia',
-    d: `M 162 120
-        C 180 110 208 108 235 112
-        C 258 116 275 126 280 138
-        C 268 143 248 140 224 138
-        C 200 136 178 132 162 120 Z`,
-  },
-  // Arabian Peninsula — tapers south to a point
-  {
-    id: 'arabia',
-    d: `M 216 140
-        C 238 132 264 136 280 148
-        C 288 158 286 172 278 183
-        C 268 193 250 198 232 192
-        C 216 185 208 171 208 157
-        C 208 150 212 143 216 140 Z`,
-  },
-  // Pakistan + Afghanistan corridor into India
-  {
-    id: 'pakistan',
-    d: `M 280 138
-        C 298 132 326 134 342 146
-        C 341 158 328 165 312 168
-        C 296 168 282 160 275 150 Z`,
-  },
-  // India — triangular subcontinent pointing south (highlighted separately)
-  // SE Asia mainland: Myanmar, Thailand, Indochina, Malay Peninsula
-  {
-    id: 'seasia_main',
-    d: `M 336 154
-        C 355 147 376 151 386 166
-        C 392 180 388 200 378 216
-        C 366 230 350 240 338 244
-        C 326 244 318 234 318 220
-        C 316 204 322 178 336 154 Z`,
-  },
-  // Malay Peninsula + Indonesia islands (Sumatra, Java, Borneo)
-  {
-    id: 'seasia_islands',
-    d: `M 338 244
-        C 344 252 348 260 345 270
-        C 342 278 334 282 325 278
-        C 350 268 372 272 380 288
-        C 378 306 360 315 338 313
-        C 316 310 307 297 316 283
-        C 322 272 332 256 338 244 Z`,
-  },
-  // Africa — full eastern + southern extent visible from Indian Ocean
-  {
-    id: 'africa',
-    d: `M 100 155
-        C 118 142 148 140 175 146
-        C 198 152 216 168 220 188
-        C 222 208 218 232 208 255
-        C 196 280 178 300 158 312
-        C 136 322 112 315 98 296
-        C 85 278 82 254 86 228
-        C 90 202 94 174 100 155 Z`,
-  },
-  // Madagascar (small island east of Africa)
-  {
-    id: 'madagascar',
-    d: `M 178 305 C 184 298 192 300 194 308 C 194 318 186 323 180 318 C 175 312 174 308 178 305 Z`,
-  },
-  // Sri Lanka (island south of India)
-  {
-    id: 'srilanka',
-    d: `M 296 278 C 302 272 310 274 312 281 C 312 289 306 294 300 291 C 295 288 293 283 296 278 Z`,
-  },
+// India border highlight
+const INDIA_BORDER: [number, number][] = [
+  [22,68],[22,72],[20,72],[18,72],[16,73],[14,74],[10,76],[8,77],[8,80],[10,80],[12,80],[15,80],[16,81],[18,84],[20,87],[22,88],[23,90],[22,92],[20,93],[18,93],[16,82],[14,80],[12,79],[10,79],[8,77],[10,76],[14,74],[16,73],[18,72],[20,72],[22,72],[22,68],
 ]
-
-// India path highlighted separately in teal
-const INDIA_PATH = `M 268 172
-  C 280 160 300 159 319 169
-  C 332 180 332 204 322 230
-  C 312 254 298 271 288 278
-  C 278 270 266 252 260 230
-  C 254 210 255 191 268 172 Z`
 
 export default function GlobeVisual() {
-  const lats = [-60, -30, 0, 30, 60]
-  const lngs = [0, 36, 72, 108, 144]
+  const mountRef = useRef<HTMLDivElement>(null)
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.92 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1, ease: 'easeOut' }}
-      className="w-full h-full flex items-center justify-center"
-    >
-      <motion.div
-        animate={{ y: [0, -12, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-        className="w-full h-full"
-      >
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full">
-          <defs>
-            {/* Deep ocean gradient */}
-            <radialGradient id="globeGrad" cx="40%" cy="38%" r="62%">
-              <stop offset="0%"   stopColor="#0a2540" />
-              <stop offset="55%"  stopColor="#041320" />
-              <stop offset="100%" stopColor="#020c16" />
-            </radialGradient>
-            {/* Atmosphere rim */}
-            <radialGradient id="atmoGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="80%"  stopColor="transparent" />
-              <stop offset="100%" stopColor="#0EA5E9" stopOpacity="0.20" />
-            </radialGradient>
-            {/* India glow */}
-            <radialGradient id="indiaGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%"   stopColor="#0FFFC1" stopOpacity="0.30" />
-              <stop offset="100%" stopColor="#0FFFC1" stopOpacity="0" />
-            </radialGradient>
-            <clipPath id="globeClip">
-              <circle cx={CX} cy={CY} r={R} />
-            </clipPath>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
+  useEffect(() => {
+    const container = mountRef.current
+    if (!container) return
 
-          {/* Ocean base */}
-          <circle cx={CX} cy={CY} r={R} fill="url(#globeGrad)" />
+    let animId: number
+    const isMobile = window.innerWidth < 768
+    const SEG = isMobile ? 32 : 64
+    const R = 1.0
 
-          {/* Physical land masses */}
-          <g clipPath="url(#globeClip)">
-            {LAND.map(lm => (
-              <path
-                key={lm.id}
-                d={lm.d}
-                fill="#0f3248"
-                stroke="#1e5070"
-                strokeWidth="0.9"
-                fillOpacity={1}
-                strokeOpacity={0.6}
-              />
-            ))}
-            {/* India — glowing teal */}
-            <path
-              d={INDIA_PATH}
-              fill="#0FFFC1"
-              stroke="#0FFFC1"
-              strokeWidth="1"
-              fillOpacity={0.20}
-              strokeOpacity={0.60}
-            />
-          </g>
+    import('three').then((THREE) => {
+      const W = container.clientWidth || 500
+      const H = container.clientHeight || 500
 
-          {/* Lat/lon grid over land */}
-          <g clipPath="url(#globeClip)" opacity={0.22}>
-            {lats.map(lat => <LatLine key={lat} lat={lat} />)}
-            {lngs.map(lng => (
-              <ellipse
-                key={lng}
-                cx={CX} cy={CY}
-                rx={R * 0.18} ry={R}
-                stroke="#163a52" strokeWidth="0.6" fill="none"
-                transform={`rotate(${lng} ${CX} ${CY})`}
-              />
-            ))}
-          </g>
+      // Renderer
+      const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: true })
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      renderer.setSize(W, H)
+      renderer.setClearColor(0x000000, 0)
+      container.appendChild(renderer.domElement)
 
-          {/* Atmosphere rim */}
-          <circle cx={CX} cy={CY} r={R} fill="url(#atmoGrad)" />
+      const scene = new THREE.Scene()
+      const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100)
+      camera.position.set(0, 0, 2.85)
 
-          {/* Globe edge */}
-          <circle cx={CX} cy={CY} r={R} fill="none"
-            stroke="#1e4068" strokeWidth="1.5" />
+      // Lights
+      scene.add(new THREE.AmbientLight(0x1a3050, 4))
+      const sun = new THREE.DirectionalLight(0x7ec8e3, 1.4)
+      sun.position.set(4, 3, 3)
+      scene.add(sun)
 
-          {/* Capital flow lines → India */}
-          <g clipPath="url(#globeClip)">
-            {SOURCES.map((src, i) => (
-              <FlowLine key={i} sx={src.x} sy={src.y} delay={i * 0.8} />
-            ))}
-          </g>
+      // Globe body
+      const globeMat = new THREE.MeshPhongMaterial({
+        color: 0x071828,
+        emissive: 0x030e18,
+        shininess: 20,
+      })
+      const globe = new THREE.Mesh(new THREE.SphereGeometry(R, SEG, SEG), globeMat)
+      scene.add(globe)
 
-          {/* India glow halo */}
-          <circle cx={INDIA.x} cy={INDIA.y} r={34} fill="url(#indiaGlow)" />
+      // Atmosphere glow (Fresnel, BackSide)
+      const atmosMat = new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        transparent: true,
+        depthWrite: false,
+        uniforms: { c: { value: new THREE.Color(0x0ea5e9) } },
+        vertexShader: `
+          varying float vI;
+          void main() {
+            vec3 n = normalize(normalMatrix * normal);
+            vec3 e = normalize(vec3(modelViewMatrix * vec4(position, 1.0)));
+            vI = pow(0.75 - dot(n, e), 2.5);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }`,
+        fragmentShader: `
+          uniform vec3 c;
+          varying float vI;
+          void main() { gl_FragColor = vec4(c, vI * 0.55); }`,
+      })
+      scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.07, SEG, SEG), atmosMat))
 
-          {/* India pulse ring */}
-          <motion.circle
-            cx={INDIA.x} cy={INDIA.y} r={14}
-            stroke="#0FFFC1" strokeWidth="1.5" fill="none"
-            animate={{ r: [10, 24], opacity: [0.8, 0] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
-          />
+      // Group for all geo objects (rotation applies here)
+      const geoGroup = new THREE.Group()
+      scene.add(geoGroup)
 
-          {/* India dot */}
-          <circle cx={INDIA.x} cy={INDIA.y} r={5} fill="#0FFFC1" filter="url(#glow)" />
-          <circle cx={INDIA.x} cy={INDIA.y} r={3} fill="#ffffff" />
+      // Continent lines
+      const cLineMat = new THREE.LineBasicMaterial({ color: 0x1d4a6a, transparent: true, opacity: 0.65 })
+      CONTINENT_LINES.forEach((pts) => {
+        const verts: number[] = []
+        pts.forEach(([lat, lon]) => {
+          const [x, y, z] = ll2xyz(lat, lon, R + 0.001)
+          verts.push(x, y, z)
+        })
+        const geo = new THREE.BufferGeometry()
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3))
+        geoGroup.add(new THREE.Line(geo, cLineMat))
+      })
 
-          {/* India label */}
-          <text x={INDIA.x + 9} y={INDIA.y - 9}
-            fill="#0FFFC1" fontSize="9.5" fontFamily="system-ui, sans-serif"
-            fontWeight="700" letterSpacing="0.02em" opacity={0.9}>
-            India
-          </text>
+      // India border highlighted
+      const indiaLineMat = new THREE.LineBasicMaterial({ color: 0x10b981, transparent: true, opacity: 1 })
+      const indiaVerts: number[] = []
+      INDIA_BORDER.forEach(([lat, lon]) => {
+        const [x, y, z] = ll2xyz(lat, lon, R + 0.003)
+        indiaVerts.push(x, y, z)
+      })
+      const indiaGeo = new THREE.BufferGeometry()
+      indiaGeo.setAttribute('position', new THREE.Float32BufferAttribute(indiaVerts, 3))
+      geoGroup.add(new THREE.Line(indiaGeo, indiaLineMat))
 
-          {/* Source city dots + full names */}
-          {SOURCES.map((src, i) => {
-            // For left-edge cities (SF, NY) labels go right; others go right too
-            const labelX = src.x < 100 ? src.x + 6 : src.x + 6
-            const labelY = src.y - 6
-            return (
-              <g key={i}>
-                <circle cx={src.x} cy={src.y} r={2.8} fill="#4a8faf" opacity={0.85} />
-                <text
-                  x={labelX}
-                  y={labelY}
-                  fill="#5aaed0"
-                  fontSize="8.5"
-                  fontFamily="system-ui, sans-serif"
-                  opacity={0.80}
-                >
-                  {src.label}
-                </text>
-              </g>
-            )
-          })}
+      // India point light + dot + ring
+      const [ix, iy, iz] = ll2xyz(INDIA.lat, INDIA.lon, R)
+      const indiaLight = new THREE.PointLight(0x10b981, 3, 1.2)
+      indiaLight.position.set(ix, iy, iz)
+      geoGroup.add(indiaLight)
 
-          {/* Specular highlight */}
-          <ellipse cx={CX - 65} cy={CY - 78} rx={52} ry={32}
-            fill="white" opacity={0.04}
-            transform="rotate(-20 235 172)" />
-        </svg>
-      </motion.div>
-    </motion.div>
-  )
+      const indiaDot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.02, 10, 10),
+        new THREE.MeshBasicMaterial({ color: 0x10b981 }),
+      )
+      indiaDot.position.set(ix, iy, iz)
+      geoGroup.add(indiaDot)
+
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.068, 32), ringMat)
+      ring.position.set(ix, iy, iz)
+      ring.lookAt(new THREE.Vector3(ix * 3, iy * 3, iz * 3))
+      geoGroup.add(ring)
+
+      // Source city dots
+      const cityMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+      CITIES.forEach((city) => {
+        const [cx, cy, cz] = ll2xyz(city.lat, city.lon, R + 0.003)
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.013, 8, 8), cityMat)
+        dot.position.set(cx, cy, cz)
+        geoGroup.add(dot)
+      })
+
+      // Arcs + animated particles
+      type ArcParticle = { mesh: InstanceType<typeof THREE.Mesh>; curve: InstanceType<typeof THREE.QuadraticBezierCurve3>; t: number; speed: number }
+      const particles: ArcParticle[] = []
+      const arcLineMat = new THREE.LineBasicMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.20 })
+
+      CITIES.forEach((city, i) => {
+        const [sx, sy, sz] = ll2xyz(city.lat, city.lon, R)
+        const [ex, ey, ez] = ll2xyz(INDIA.lat, INDIA.lon, R)
+        const mid = new THREE.Vector3((sx + ex) / 2, (sy + ey) / 2, (sz + ez) / 2)
+        mid.normalize().multiplyScalar(R * 1.5)
+        const curve = new THREE.QuadraticBezierCurve3(
+          new THREE.Vector3(sx, sy, sz), mid, new THREE.Vector3(ex, ey, ez),
+        )
+        const linePts = curve.getPoints(60)
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(linePts)
+        geoGroup.add(new THREE.Line(lineGeo, arcLineMat))
+
+        const pMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(0.013, 6, 6),
+          new THREE.MeshBasicMaterial({ color: 0x7dd3fc }),
+        )
+        geoGroup.add(pMesh)
+        particles.push({ mesh: pMesh, curve, t: i * 0.2, speed: 0.0014 + i * 0.0002 })
+      })
+
+      // Orient so India faces camera on load
+      geoGroup.rotation.y = (-INDIA.lon - 90) * (Math.PI / 180)
+      geoGroup.rotation.x = -INDIA.lat * 0.012
+
+      // Drag state
+      let dragging = false
+      let px = 0; let py = 0
+      let vx = 0; let vy = 0
+
+      const onDown = (x: number, y: number) => { dragging = true; px = x; py = y; vx = 0; vy = 0 }
+      const onMove = (x: number, y: number) => {
+        if (!dragging) return
+        vx = (x - px) * 0.005; vy = (y - py) * 0.003
+        px = x; py = y
+      }
+      const onUp = () => { dragging = false }
+
+      renderer.domElement.addEventListener('mousedown', (e) => onDown(e.clientX, e.clientY))
+      window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY))
+      window.addEventListener('mouseup', onUp)
+      renderer.domElement.addEventListener('touchstart', (e) => onDown(e.touches[0].clientX, e.touches[0].clientY), { passive: true })
+      window.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true })
+      window.addEventListener('touchend', onUp)
+
+      const onResize = () => {
+        const w = container.clientWidth; const h = container.clientHeight
+        renderer.setSize(w, h)
+        camera.aspect = w / h
+        camera.updateProjectionMatrix()
+      }
+      window.addEventListener('resize', onResize)
+
+      let tick = 0
+      const loop = () => {
+        animId = requestAnimationFrame(loop)
+        tick += 0.016
+
+        if (dragging) {
+          geoGroup.rotation.y += vx
+          geoGroup.rotation.x = Math.max(-0.9, Math.min(0.9, geoGroup.rotation.x + vy))
+        } else {
+          vx *= 0.92; vy *= 0.92
+          geoGroup.rotation.y += vx + 0.0018
+          geoGroup.rotation.x = Math.max(-0.9, Math.min(0.9, geoGroup.rotation.x + vy))
+        }
+
+        // Pulse India ring
+        const p = 0.8 + 0.2 * Math.sin(tick * 3)
+        ring.scale.setScalar(p)
+        ringMat.opacity = p * 0.85
+
+        // Animate particles
+        particles.forEach((ap) => {
+          ap.t = (ap.t + ap.speed) % 1
+          ap.mesh.position.copy(ap.curve.getPoint(ap.t))
+        })
+
+        renderer.render(scene, camera)
+      }
+      loop()
+
+      // Cleanup
+      const cleanup = () => {
+        cancelAnimationFrame(animId)
+        window.removeEventListener('mousemove', onMove as never)
+        window.removeEventListener('mouseup', onUp)
+        window.removeEventListener('touchmove', onMove as never)
+        window.removeEventListener('touchend', onUp)
+        window.removeEventListener('resize', onResize)
+        renderer.dispose()
+        if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement)
+      }
+      ;(container as HTMLDivElement & { _gc?: () => void })._gc = cleanup
+    })
+
+    return () => {
+      cancelAnimationFrame(animId)
+      const el = container as HTMLDivElement & { _gc?: () => void }
+      if (el._gc) el._gc()
+    }
+  }, [])
+
+  return <div ref={mountRef} className="w-full h-full" style={{ cursor: 'grab' }} />
 }

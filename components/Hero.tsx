@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import GlobeVisual from './GlobeVisual'
+import dynamic from 'next/dynamic'
+
+const GlobeVisual = dynamic(() => import('./GlobeVisual'), { ssr: false })
 
 type Star = { top: string; left: string; size: string; opacity: number }
 
