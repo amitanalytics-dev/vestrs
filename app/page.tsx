@@ -5,6 +5,7 @@ import Proof from '@/components/Proof'
 import TheGap from '@/components/TheGap'
 import Solution from '@/components/Solution'
 import Returns from '@/components/Returns'
+import SmartMoney from '@/components/SmartMoney'
 import SiliconValley from '@/components/SiliconValley'
 import Waitlist from '@/components/Waitlist'
 import FinalClose from '@/components/FinalClose'
@@ -20,6 +21,7 @@ export default function Home() {
       <TheGap />
       <Solution />
       <Returns />
+      <SmartMoney />
       <SiliconValley />
       <Waitlist />
       <FinalClose />

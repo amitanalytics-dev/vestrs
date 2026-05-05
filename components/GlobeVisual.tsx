@@ -12,8 +12,8 @@ const R = 220
 const INDIA = { x: 288, y: 222 }
 
 const SOURCES = [
-  { x: 42,  y: 205, label: 'SF' },
-  { x: 62,  y: 232, label: 'NY' },
+  { x: 42,  y: 205, label: 'San Francisco' },
+  { x: 62,  y: 232, label: 'New York' },
   { x: 118, y: 140, label: 'London' },
   { x: 252, y: 158, label: 'Dubai' },
   { x: 332, y: 288, label: 'Singapore' },
@@ -47,8 +47,7 @@ function FlowLine({ sx, sy, delay }: { sx: number; sy: number; delay: number }) 
     <g>
       <path d={path} stroke="#0FFFC1" strokeWidth="1" fill="none" opacity={0.18} />
       <motion.circle
-        r={3}
-        fill="#0FFFC1"
+        r={3} fill="#0FFFC1"
         animate={{ x: xKeys, y: yKeys }}
         transition={{ duration: 4, repeat: Infinity, ease: 'linear', delay, repeatDelay: 0.6 }}
       />
@@ -62,49 +61,121 @@ function LatLine({ lat }: { lat: number }) {
   if (Math.abs(ry) < 5) return null
   return (
     <ellipse cx={CX} cy={y} rx={ry} ry={ry * 0.18}
-      stroke="#1a3a5c" strokeWidth="0.6" fill="none" />
+      stroke="#163a52" strokeWidth="0.6" fill="none" />
   )
 }
 
-// Simplified continent outlines — hand-crafted for this SVG coordinate space.
-// India-centric view: Africa (left), Europe (upper-left), Arabia (upper-centre),
-// India (highlighted, centre-right), SE Asia (right), Eurasia (top).
-const LANDMASSES = [
+// Physical map continent paths — India-centric Eastern Hemisphere view.
+// Colours: ocean #031828, land #0f3248, India teal.
+const LAND = [
+  // Russia + Siberia + Central Asia (top band)
   {
     id: 'eurasia',
-    d: 'M 72 108 C 132 80 210 73 278 74 C 345 75 400 92 422 112 C 405 128 366 118 318 112 C 273 107 220 107 176 112 C 140 117 100 127 76 128 Z',
+    d: `M 68 105
+        C 100 82 155 70 220 68
+        C 285 66 345 76 388 96
+        C 415 110 420 120 408 128
+        C 388 128 365 118 330 112
+        C 295 107 258 104 220 106
+        C 182 107 145 112 112 118
+        C 90 122 72 128 68 128 Z`,
   },
+  // Scandinavia / UK peninsula hint
+  {
+    id: 'scandinavia',
+    d: `M 95 96 C 105 88 118 86 126 92 C 130 98 126 106 118 108
+        C 110 106 98 102 95 96 Z`,
+  },
+  // Europe (Iberia → France → UK → Balkans)
   {
     id: 'europe',
-    d: 'M 76 128 C 94 112 118 105 140 106 C 160 106 168 117 166 128 C 153 137 134 141 113 139 C 95 136 76 128 76 128 Z',
+    d: `M 68 128
+        C 80 112 98 105 120 104
+        C 140 104 156 110 162 120
+        C 164 126 160 130 152 133
+        C 140 137 122 140 104 138
+        C 86 135 68 128 68 128 Z`,
   },
+  // Anatolia + Caucasus + Iran (Europe → Arabia bridge)
   {
     id: 'anatolia',
-    d: 'M 166 128 C 184 117 210 115 236 119 C 258 123 273 132 277 143 C 261 147 238 141 213 139 C 188 137 172 133 166 128 Z',
+    d: `M 162 120
+        C 180 110 208 108 235 112
+        C 258 116 275 126 280 138
+        C 268 143 248 140 224 138
+        C 200 136 178 132 162 120 Z`,
   },
+  // Arabian Peninsula — tapers south to a point
   {
     id: 'arabia',
-    d: 'M 213 143 C 235 135 263 139 279 153 C 284 167 280 183 266 193 C 248 201 227 195 213 181 C 206 168 206 154 213 143 Z',
+    d: `M 216 140
+        C 238 132 264 136 280 148
+        C 288 158 286 172 278 183
+        C 268 193 250 198 232 192
+        C 216 185 208 171 208 157
+        C 208 150 212 143 216 140 Z`,
   },
+  // Pakistan + Afghanistan corridor into India
   {
     id: 'pakistan',
-    d: 'M 277 143 C 295 137 323 139 337 151 C 336 164 322 171 305 173 C 289 173 276 164 269 154 Z',
+    d: `M 280 138
+        C 298 132 326 134 342 146
+        C 341 158 328 165 312 168
+        C 296 168 282 160 275 150 Z`,
   },
+  // India — triangular subcontinent pointing south (highlighted separately)
+  // SE Asia mainland: Myanmar, Thailand, Indochina, Malay Peninsula
   {
     id: 'seasia_main',
-    d: 'M 332 159 C 350 152 370 156 380 171 C 384 190 376 212 362 228 C 348 241 332 243 322 230 C 315 218 318 194 332 159 Z',
+    d: `M 336 154
+        C 355 147 376 151 386 166
+        C 392 180 388 200 378 216
+        C 366 230 350 240 338 244
+        C 326 244 318 234 318 220
+        C 316 204 322 178 336 154 Z`,
   },
+  // Malay Peninsula + Indonesia islands (Sumatra, Java, Borneo)
   {
     id: 'seasia_islands',
-    d: 'M 325 279 C 345 268 367 272 374 288 C 372 306 354 314 334 312 C 316 308 308 295 318 281 Z',
+    d: `M 338 244
+        C 344 252 348 260 345 270
+        C 342 278 334 282 325 278
+        C 350 268 372 272 380 288
+        C 378 306 360 315 338 313
+        C 316 310 307 297 316 283
+        C 322 272 332 256 338 244 Z`,
   },
+  // Africa — full eastern + southern extent visible from Indian Ocean
   {
     id: 'africa',
-    d: 'M 107 158 C 140 143 176 148 199 167 C 210 190 210 223 198 257 C 185 285 163 306 141 309 C 118 306 100 283 98 254 C 96 224 102 191 107 158 Z',
+    d: `M 100 155
+        C 118 142 148 140 175 146
+        C 198 152 216 168 220 188
+        C 222 208 218 232 208 255
+        C 196 280 178 300 158 312
+        C 136 322 112 315 98 296
+        C 85 278 82 254 86 228
+        C 90 202 94 174 100 155 Z`,
+  },
+  // Madagascar (small island east of Africa)
+  {
+    id: 'madagascar',
+    d: `M 178 305 C 184 298 192 300 194 308 C 194 318 186 323 180 318 C 175 312 174 308 178 305 Z`,
+  },
+  // Sri Lanka (island south of India)
+  {
+    id: 'srilanka',
+    d: `M 296 278 C 302 272 310 274 312 281 C 312 289 306 294 300 291 C 295 288 293 283 296 278 Z`,
   },
 ]
 
-const INDIA_PATH = 'M 264 174 C 279 163 299 162 317 172 C 329 184 328 208 318 233 C 308 255 294 271 285 277 C 275 268 264 250 258 228 C 253 208 255 191 264 174 Z'
+// India path highlighted separately in teal
+const INDIA_PATH = `M 268 172
+  C 280 160 300 159 319 169
+  C 332 180 332 204 322 230
+  C 312 254 298 271 288 278
+  C 278 270 266 252 260 230
+  C 254 210 255 191 268 172 Z`
 
 export default function GlobeVisual() {
   const lats = [-60, -30, 0, 30, 60]
@@ -124,17 +195,20 @@ export default function GlobeVisual() {
       >
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full">
           <defs>
-            <radialGradient id="globeGrad" cx="38%" cy="35%" r="65%">
-              <stop offset="0%"   stopColor="#0a2440" />
-              <stop offset="60%"  stopColor="#051020" />
-              <stop offset="100%" stopColor="#010c18" />
+            {/* Deep ocean gradient */}
+            <radialGradient id="globeGrad" cx="40%" cy="38%" r="62%">
+              <stop offset="0%"   stopColor="#0a2540" />
+              <stop offset="55%"  stopColor="#041320" />
+              <stop offset="100%" stopColor="#020c16" />
             </radialGradient>
+            {/* Atmosphere rim */}
             <radialGradient id="atmoGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="82%"  stopColor="transparent" />
-              <stop offset="100%" stopColor="#0EA5E9" stopOpacity="0.18" />
+              <stop offset="80%"  stopColor="transparent" />
+              <stop offset="100%" stopColor="#0EA5E9" stopOpacity="0.20" />
             </radialGradient>
+            {/* India glow */}
             <radialGradient id="indiaGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%"   stopColor="#0FFFC1" stopOpacity="0.35" />
+              <stop offset="0%"   stopColor="#0FFFC1" stopOpacity="0.30" />
               <stop offset="100%" stopColor="#0FFFC1" stopOpacity="0" />
             </radialGradient>
             <clipPath id="globeClip">
@@ -147,63 +221,57 @@ export default function GlobeVisual() {
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
-            <filter id="softGlow">
-              <feGaussianBlur stdDeviation="5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
           </defs>
 
-          {/* Ocean */}
+          {/* Ocean base */}
           <circle cx={CX} cy={CY} r={R} fill="url(#globeGrad)" />
 
-          {/* Continents */}
+          {/* Physical land masses */}
           <g clipPath="url(#globeClip)">
-            {LANDMASSES.map(lm => (
+            {LAND.map(lm => (
               <path
                 key={lm.id}
                 d={lm.d}
-                fill="#0e2d47"
-                stroke="#1e4a6e"
-                strokeWidth="0.8"
-                fillOpacity={0.95}
-                strokeOpacity={0.55}
+                fill="#0f3248"
+                stroke="#1e5070"
+                strokeWidth="0.9"
+                fillOpacity={1}
+                strokeOpacity={0.6}
               />
             ))}
-            {/* India — highlighted in teal */}
+            {/* India — glowing teal */}
             <path
               d={INDIA_PATH}
               fill="#0FFFC1"
               stroke="#0FFFC1"
               strokeWidth="1"
-              fillOpacity={0.18}
-              strokeOpacity={0.55}
+              fillOpacity={0.20}
+              strokeOpacity={0.60}
             />
           </g>
 
-          {/* Grid lines over continents */}
-          <g clipPath="url(#globeClip)" opacity={0.3}>
+          {/* Lat/lon grid over land */}
+          <g clipPath="url(#globeClip)" opacity={0.22}>
             {lats.map(lat => <LatLine key={lat} lat={lat} />)}
             {lngs.map(lng => (
               <ellipse
                 key={lng}
                 cx={CX} cy={CY}
                 rx={R * 0.18} ry={R}
-                stroke="#1a3a5c" strokeWidth="0.6" fill="none"
+                stroke="#163a52" strokeWidth="0.6" fill="none"
                 transform={`rotate(${lng} ${CX} ${CY})`}
               />
             ))}
           </g>
 
-          {/* Atmosphere ring */}
+          {/* Atmosphere rim */}
           <circle cx={CX} cy={CY} r={R} fill="url(#atmoGrad)" />
 
           {/* Globe edge */}
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke="#1e4068" strokeWidth="1.5" />
+          <circle cx={CX} cy={CY} r={R} fill="none"
+            stroke="#1e4068" strokeWidth="1.5" />
 
-          {/* Flow lines */}
+          {/* Capital flow lines → India */}
           <g clipPath="url(#globeClip)">
             {SOURCES.map((src, i) => (
               <FlowLine key={i} sx={src.x} sy={src.y} delay={i * 0.8} />
@@ -211,13 +279,13 @@ export default function GlobeVisual() {
           </g>
 
           {/* India glow halo */}
-          <circle cx={INDIA.x} cy={INDIA.y} r={32} fill="url(#indiaGlow)" />
+          <circle cx={INDIA.x} cy={INDIA.y} r={34} fill="url(#indiaGlow)" />
 
           {/* India pulse ring */}
           <motion.circle
             cx={INDIA.x} cy={INDIA.y} r={14}
             stroke="#0FFFC1" strokeWidth="1.5" fill="none"
-            animate={{ r: [10, 22], opacity: [0.8, 0] }}
+            animate={{ r: [10, 24], opacity: [0.8, 0] }}
             transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
           />
 
@@ -226,31 +294,38 @@ export default function GlobeVisual() {
           <circle cx={INDIA.x} cy={INDIA.y} r={3} fill="#ffffff" />
 
           {/* India label */}
-          <text x={INDIA.x + 9} y={INDIA.y - 8}
-            fill="#0FFFC1" fontSize="9" fontFamily="system-ui, sans-serif"
-            fontWeight="700" opacity={0.85}>India</text>
+          <text x={INDIA.x + 9} y={INDIA.y - 9}
+            fill="#0FFFC1" fontSize="9.5" fontFamily="system-ui, sans-serif"
+            fontWeight="700" letterSpacing="0.02em" opacity={0.9}>
+            India
+          </text>
 
-          {/* Source city dots + labels */}
-          {SOURCES.map((src, i) => (
-            <g key={i}>
-              <circle cx={src.x} cy={src.y} r={2.5} fill="#4a7fa5" opacity={0.8} />
-              <text
-                x={src.x + (src.x < 100 ? 5 : -src.label.length * 5 - 2)}
-                y={src.y - 5}
-                fill="#4a8fb5"
-                fontSize="8"
-                fontFamily="system-ui, sans-serif"
-                opacity={0.7}
-              >
-                {src.label}
-              </text>
-            </g>
-          ))}
+          {/* Source city dots + full names */}
+          {SOURCES.map((src, i) => {
+            // For left-edge cities (SF, NY) labels go right; others go right too
+            const labelX = src.x < 100 ? src.x + 6 : src.x + 6
+            const labelY = src.y - 6
+            return (
+              <g key={i}>
+                <circle cx={src.x} cy={src.y} r={2.8} fill="#4a8faf" opacity={0.85} />
+                <text
+                  x={labelX}
+                  y={labelY}
+                  fill="#5aaed0"
+                  fontSize="8.5"
+                  fontFamily="system-ui, sans-serif"
+                  opacity={0.80}
+                >
+                  {src.label}
+                </text>
+              </g>
+            )
+          })}
 
           {/* Specular highlight */}
-          <ellipse cx={CX - 65} cy={CY - 75} rx={55} ry={35}
+          <ellipse cx={CX - 65} cy={CY - 78} rx={52} ry={32}
             fill="white" opacity={0.04}
-            transform="rotate(-20 235 175)" />
+            transform="rotate(-20 235 172)" />
         </svg>
       </motion.div>
     </motion.div>
