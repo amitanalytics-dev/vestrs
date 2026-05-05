@@ -56,7 +56,7 @@ export default function Hero() {
             className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-4 py-1.5 text-sm text-emerald-700 font-medium mb-8"
           >
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            Private Beta · Invite Only
+            Early Access · Cohort-based · 50 seats per round
           </motion.div>
 
           <motion.h1
@@ -75,9 +75,9 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="text-lg text-slate-500 leading-relaxed mb-10 max-w-xl"
           >
-            India is producing world-class founders, category-defining companies, and
-            venture-scale returns — and global capital is only beginning to notice.
-            Vestrs gives you access before it becomes obvious.
+            112 unicorns. A billion-person digital economy. Ex-Goldman, ex-Google,
+            ex-McKinsey founders choosing India over the Valley. The window is wide open —
+            and most global capital hasn&apos;t walked through it yet. Vestrs gets you in first.
           </motion.p>
 
           <motion.div
@@ -110,7 +110,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#FAFAFA] to-transparent z-10" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-10" />
     </section>
   )
 }

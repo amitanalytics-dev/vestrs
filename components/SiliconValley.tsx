@@ -3,14 +3,35 @@
 import { motion } from 'framer-motion'
 
 const timeline = [
-  { era: '1995', label: 'Early US Internet', names: 'Amazon · Google · eBay', returns: '1000x+', note: 'Investors who were early made careers, not just returns.', highlight: false },
-  { era: '2005', label: 'Early China Internet', names: 'Alibaba · Tencent · Baidu', returns: '500x+', note: 'A decade of compounding that global latecomers missed entirely.', highlight: false },
-  { era: '2025', label: 'India — Now', names: 'Next Flipkart · Next Razorpay · Next ?', returns: '???', note: "The window is open. Most global investors still haven't walked through it.", highlight: true },
+  {
+    era: '1995',
+    label: 'Early US Internet',
+    names: 'Amazon · Google · eBay · Yahoo',
+    returns: '1000x+',
+    note: 'The investors who were early made careers, not just returns. Most missed it because it seemed too early.',
+    highlight: false,
+  },
+  {
+    era: '2005',
+    label: 'Early China Internet',
+    names: 'Alibaba · Tencent · Baidu · JD.com',
+    returns: '500x+',
+    note: 'A decade of compounding that global latecomers missed entirely. Those who entered early retired on it.',
+    highlight: false,
+  },
+  {
+    era: '2025',
+    label: 'India — Right Now',
+    names: 'Next Flipkart · Next Razorpay · Next ?',
+    returns: '???',
+    note: "The infrastructure is built. The founders are ready. The consumers are online. The window is open. Most global investors still haven't walked through it.",
+    highlight: true,
+  },
 ]
 
 export default function SiliconValley() {
   return (
-    <section className="py-32 bg-[#F8FAFC]">
+    <section className="py-32 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
@@ -29,9 +50,10 @@ export default function SiliconValley() {
               early don&apos;t just make returns — they make careers.
             </p>
             <p className="text-slate-500 leading-relaxed mb-5 text-base">
-              India is at that inflection point. The infrastructure is built. The
-              founders are ready. The consumers are online. What&apos;s missing is patient,
-              conviction-based global capital.
+              India is at that inflection point right now. 112 unicorns. $50B+ in
+              IPO exits since 2021. World-class founders who used to leave for the
+              Valley — staying home. What&apos;s missing is patient, conviction-based
+              global capital.
             </p>
             <p className="text-[#0F172A] font-bold text-base">That&apos;s where you come in.</p>
           </motion.div>
