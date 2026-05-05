@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
+import GuidedText from './GuidedText'
 
 const GlobeVisual = dynamic(() => import('./GlobeVisual'), { ssr: false })
 
@@ -75,16 +76,21 @@ export default function Hero() {
             <span className="text-gradient-teal">won&apos;t be created in Silicon Valley alone.</span>
           </motion.h1>
 
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-lg text-slate-400 leading-relaxed mb-10 max-w-xl"
+            className="mb-10 max-w-xl"
           >
-            112 unicorns. A billion-person digital economy. Ex-Goldman, ex-Google,
-            ex-McKinsey founders choosing India over the Valley. The window is wide open —
-            and most global capital hasn&apos;t walked through it yet. Vestrs gets you in first.
-          </motion.p>
+            <GuidedText
+              text="112 unicorns. A billion-person digital economy. Ex-Goldman, ex-Google, ex-McKinsey founders choosing India over the Valley. The window is wide open — and most global capital hasn't walked through it yet. Vestrs gets you in first."
+              speed={270}
+              delay={1100}
+              autoplay
+              loop={false}
+              className="text-lg leading-relaxed"
+            />
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}

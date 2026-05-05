@@ -36,3 +36,37 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ─── Guided Reading word states ────────────────────────── */
+.guided-word {
+  display: inline;
+  border-radius: 4px;
+  padding: 0.02em 0.05em;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  color: rgba(248, 250, 252, 0.28);
+  font-weight: 400;
+  transition:
+    color       150ms ease,
+    font-weight 150ms ease,
+    background  150ms ease,
+    box-shadow  150ms ease,
+    text-shadow 150ms ease;
+}
+
+.guided-word[data-state="active"] {
+  color: #f8fafc;
+  font-weight: 700;
+  background: var(--hl, rgba(16, 185, 129, 0.10));
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--hl, rgba(16,185,129,0.10)) 60%, transparent);
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+}
+
+.guided-word[data-state="read"] {
+  color: rgba(248, 250, 252, 0.62);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guided-word { transition: none !important; }
+}

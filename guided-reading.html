@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guided Reading — Interactive Text Effect</title>
+  <style>
+    /* ═══════════════════════════════════════════════
+       CSS CUSTOM PROPERTIES — edit to customise
+       ═══════════════════════════════════════════════ */
+    :root {
+      --color-bg:        #080d18;
+      --color-surface:   #0e1525;
+      --color-border:    rgba(255, 255, 255, 0.07);
+      --color-text:      #e8edf5;
+      --color-text-dim:  rgba(232, 237, 245, 0.30);
+      --color-text-read: rgba(232, 237, 245, 0.58);
+      --color-accent:    #a78bfa;      /* change this one variable to retheme */
+      --color-accent-b:  #38bdf8;      /* second gradient stop on progress bar */
+      --color-hl-bg:     rgba(167, 139, 250, 0.11);
+      --color-hl-glow:   rgba(167, 139, 250, 0.22);
+
+      --font-body:       'Georgia', 'Times New Roman', serif;
+      --font-ui:         system-ui, -apple-system, sans-serif;
+      --font-size:       clamp(1rem, 2.3vw, 1.18rem);
+      --line-height:     1.95;
+
+      /* Timing */
+      --speed:           320ms;   /* kept in sync with JS CONFIG.speed */
+      --t-word:          155ms;
+      --t-marker:        115ms;
+      --t-fade:          90ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1.25rem, 5vw, 3rem);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Page ─────────────────────────────────────── */
+    .page { width: 100%; max-width: 760px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+    .page > * {
+      animation: fadeUp 0.5s ease both;
+    }
+    .page > *:nth-child(1) { animation-delay:  0ms; }
+    .page > *:nth-child(2) { animation-delay: 50ms; }
+    .page > *:nth-child(3) { animation-delay: 90ms; }
+    .page > *:nth-child(4) { animation-delay:130ms; }
+    .page > *:nth-child(5) { animation-delay:170ms; }
+    .page > *:nth-child(6) { animation-delay:200ms; }
+
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+      opacity: 0.85;
+    }
+
+    h1 {
+      font-family: var(--font-ui);
+      font-size: clamp(1.55rem, 4.5vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 0.3rem;
+    }
+
+    .subtitle {
+      font-family: var(--font-ui);
+      font-size: 0.84rem;
+      color: rgba(232, 237, 245, 0.38);
+      margin-bottom: 1.75rem;
+    }
+
+    /* ─── Card ─────────────────────────────────────── */
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: clamp(1.5rem, 5vw, 2.6rem);
+      box-shadow:
+        0 8px 40px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      position: relative;
+    }
+
+    /* ─── Sliding highlight marker ─────────────────── */
+    #marker {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+      background: var(--color-hl-bg);
+      border-radius: 6px;
+      border-bottom: 1.5px solid var(--color-accent);
+      box-shadow: 0 0 14px var(--color-hl-glow), 0 2px 6px var(--color-hl-glow);
+      opacity: 0;
+      /* all transitions set programmatically — see placeMarker() */
+    }
+
+    /* ─── Text body ────────────────────────────────── */
+    .text-body {
+      position: relative;
+      z-index: 1;
+      font-size: var(--font-size);
+      line-height: var(--line-height);
+    }
+    .text-body p              { margin-bottom: 1.25em; }
+    .text-body p:last-child   { margin-bottom: 0; }
+
+    /* ─── Word states ──────────────────────────────── */
+    .w {
+      display: inline;
+      cursor: pointer;
+      color: var(--color-text-dim);
+      font-weight: 400;
+      border-radius: 3px;
+      position: relative;
+      z-index: 1;
+      -webkit-user-select: none;
+      user-select: none;
+      transition:
+        color       var(--t-word) ease,
+        font-weight var(--t-word) ease,
+        text-shadow var(--t-word) ease;
+    }
+
+    .w:hover:not(.active) { color: var(--color-text-read); }
+    .w.read                { color: var(--color-text-read); }
+    .w.active {
+      color: var(--color-text);
+      font-weight: 700;
+      text-shadow: 0 0 18px rgba(167, 139, 250, 0.35);
+    }
+
+    /* ─── Progress bar ─────────────────────────────── */
+    .progress-track {
+      height: 2px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 2px;
+      margin-top: 1.65rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--color-accent), var(--color-accent-b));
+      border-radius: 2px;
+      transition: width 200ms ease;
+    }
+
+    /* ─── Controls ─────────────────────────────────── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: var(--font-ui);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.46rem 0.9rem;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      line-height: 1;
+      white-space: nowrap;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: background 0.14s, border-color 0.14s, transform 0.1s, opacity 0.14s;
+    }
+    .btn:hover   { background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.18); }
+    .btn:active  { transform: scale(0.95); }
+    .btn:disabled { opacity: 0.28; pointer-events: none; }
+
+    .btn-play {
+      background: var(--color-accent);
+      border-color: transparent;
+      color: #0e0620;
+      min-width: 5.8rem;
+      font-size: 0.80rem;
+      justify-content: center;
+      font-weight: 700;
+    }
+    .btn-play:hover { background: var(--color-accent); filter: brightness(1.12); }
+
+    /* Speed cluster */
+    .speed-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-left: auto;
+      font-family: var(--font-ui);
+      font-size: 0.73rem;
+      color: rgba(232, 237, 245, 0.38);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 88px;
+      height: 3px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.14);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      border: none;
+      cursor: pointer;
+    }
+
+    .counter {
+      font-family: var(--font-ui);
+      font-size: 0.70rem;
+      color: rgba(232, 237, 245, 0.28);
+      white-space: nowrap;
+      min-width: 4.5rem;
+      text-align: right;
+    }
+
+    /* Keyboard hint */
+    .hint {
+      font-family: var(--font-ui);
+      font-size: 0.65rem;
+      color: rgba(232, 237, 245, 0.20);
+      margin-top: 0.85rem;
+      display: flex;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+    .hint span { display: inline-flex; align-items: center; gap: 0.22rem; }
+    kbd {
+      font-size: 0.60rem;
+      font-family: var(--font-ui);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 3px;
+      padding: 0.08em 0.32em;
+    }
+
+    /* ─── Reduced motion ───────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .page > *           { animation: none !important; }
+      .w, .progress-fill  { transition: none !important; }
+    }
+    .no-motion .w,
+    .no-motion .progress-fill { transition: none !important; }
+    .no-motion .page > *      { animation: none !important; }
+
+    /* ─── Mobile tweaks ────────────────────────────── */
+    @media (max-width: 520px) {
+      .speed-wrap { margin-left: 0; }
+      .counter    { margin-left: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <p class="eyebrow">Interactive Demo</p>
+  <h1>Guided Reading Mode</h1>
+  <p class="subtitle">Press play — or click any word to jump to that position.</p>
+
+  <div class="card" id="card">
+    <div id="marker" aria-hidden="true"></div>
+
+    <div class="text-body" id="textBody">
+      <p>The most dangerous phrase in the language is "we've always done it this way." Change doesn't announce itself with trumpets or arrive on schedule. It slips in quietly, through a side door you left open while you were busy defending the front.</p>
+
+      <p>Every great story begins with a sentence no one expected to be true. The ones who succeed are not always the most talented — they are the ones who stayed curious, who showed up without applause, and refused to stop before the world caught up to what they already believed.</p>
+
+      <p>Attention is the rarest and purest form of generosity. In a world designed to fragment your focus, choosing to be fully present with one idea, one person, one paragraph — that is a radical act. The words you read slowly are the ones that change you.</p>
+    </div>
+
+    <div class="progress-track"
+         role="progressbar"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+         id="progressTrack">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="btnPrev" title="Previous word (←)" disabled>← Prev</button>
+    <button class="btn btn-play" id="btnPlay">▶ Play</button>
+    <button class="btn" id="btnNext" title="Next word (→)">Next →</button>
+    <button class="btn" id="btnReset" title="Reset to start (R)">↺ Reset</button>
+
+    <div class="speed-wrap">
+      <label for="speedSlider">Speed</label>
+      <input type="range" id="speedSlider" min="80" max="900" step="20" value="320">
+      <span id="speedVal">320ms</span>
+    </div>
+
+    <span class="counter" id="counter" aria-live="polite">0 / 0</span>
+  </div>
+
+  <div class="hint" aria-label="Keyboard shortcuts">
+    <span><kbd>Space</kbd> play / pause</span>
+    <span><kbd>←</kbd> <kbd>→</kbd> step word</span>
+    <span><kbd>R</kbd> reset</span>
+    <span>click any word to jump</span>
+  </div>
+
+</div><!-- /.page -->
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONFIG OBJECT — primary customisation for JS behaviour.
+   CSS variables above control all visual styling.
+   ═══════════════════════════════════════════════════════ */
+const CONFIG = {
+  speed:         320,    // ms between words (synced with speed slider)
+  highlightColor:'rgba(167, 139, 250, 0.11)', // overrides --color-hl-bg at runtime
+  autoplay:      false,  // set true to start immediately on page load
+  loop:          true,   // restart from word 1 when the text finishes
+  markerPad:     { x: 7, y: 4 }, // extra px around each word for the marker rect
+};
+
+/* ─── DOM refs ─────────────────────────────────────── */
+const card          = document.getElementById('card');
+const textBody      = document.getElementById('textBody');
+const markerEl      = document.getElementById('marker');
+const progressFill  = document.getElementById('progressFill');
+const progressTrack = document.getElementById('progressTrack');
+const btnPlay       = document.getElementById('btnPlay');
+const btnPrev       = document.getElementById('btnPrev');
+const btnNext       = document.getElementById('btnNext');
+const btnReset      = document.getElementById('btnReset');
+const speedSlider   = document.getElementById('speedSlider');
+const speedValEl    = document.getElementById('speedVal');
+const counterEl     = document.getElementById('counter');
+
+/* ─── State ────────────────────────────────────────── */
+let words         = [];    // all .w <span> elements after init
+let cursor        = -1;    // index of the currently active word (-1 = none)
+let running       = false;
+let timerId       = null;
+let markerLastY   = null;  // previous marker top — used for line-change detection
+let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ═══════════════════════════════════════════════════════
+   INIT — split text into word spans via safe DOM walking
+   ═══════════════════════════════════════════════════════ */
+(function init() {
+  textBody.querySelectorAll('p').forEach(function(p) {
+    /* Collect text nodes before touching the DOM */
+    const textNodes = [];
+    const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null);
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+    textNodes.forEach(function(node) {
+      const parts = node.textContent.split(/(\s+)/);
+      const frag  = document.createDocumentFragment();
+      parts.forEach(function(part) {
+        if (!part) return;
+        if (/^\s+$/.test(part)) {
+          frag.appendChild(document.createTextNode(part));
+        } else {
+          const span = document.createElement('span');
+          span.className = 'w';
+          span.textContent = part;
+          frag.appendChild(span);
+        }
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+  });
+
+  words = Array.from(textBody.querySelectorAll('.w'));
+  words.forEach(function(w, i) {
+    w.addEventListener('click', function() { jumpTo(i); });
+  });
+
+  /* Apply config highlight colour to CSS variable */
+  document.documentElement.style.setProperty('--color-hl-bg', CONFIG.highlightColor);
+
+  if (reducedMotion) document.body.classList.add('no-motion');
+
+  syncUI();
+  if (CONFIG.autoplay) startPlayback();
+}());
+
+/* ═══════════════════════════════════════════════════════
+   MARKER — sliding highlight rect
+   ═══════════════════════════════════════════════════════ */
+function placeMarker(wordEl, snap) {
+  var cardRect = card.getBoundingClientRect();
+  var wRect    = wordEl.getBoundingClientRect();
+  var px = CONFIG.markerPad.x, py = CONFIG.markerPad.y;
+
+  var L = wRect.left - cardRect.left - px;
+  var T = wRect.top  - cardRect.top  - py;
+  var W = wRect.width  + px * 2;
+  var H = wRect.height + py * 2;
+
+  var firstAppear = (markerLastY === null);
+  var lineChanged = !firstAppear && Math.abs(T - markerLastY) > wRect.height * 0.55;
+
+  if (reducedMotion || snap) {
+    /* Instant — no animation */
+    markerEl.style.transition = 'none';
+    setGeom(L, T, W, H);
+    markerEl.style.opacity = '1';
+
+  } else if (firstAppear) {
+    /* Very first word: appear with a fade-in */
+    markerEl.style.transition = 'none';
+    setGeom(L, T, W, H);
+    void markerEl.offsetHeight; /* force reflow so transition fires */
+    markerEl.style.transition = 'opacity 200ms ease';
+    markerEl.style.opacity = '1';
+
+  } else if (lineChanged) {
+    /* Jumped to a new line — teleport (no lateral slide) then flash in */
+    markerEl.style.transition = 'none';
+    setGeom(L, T, W, H);
+    void markerEl.offsetHeight;
+    markerEl.style.transition = 'opacity 110ms ease';
+    markerEl.style.opacity = '1';
+
+  } else {
+    /* Same line — spring slide */
+    markerEl.style.transition =
+      'left   var(--t-marker) cubic-bezier(0.34, 1.2, 0.64, 1),' +
+      'top    var(--t-marker) cubic-bezier(0.34, 1.2, 0.64, 1),' +
+      'width  var(--t-marker) ease,' +
+      'height var(--t-marker) ease,' +
+      'opacity 80ms ease';
+    setGeom(L, T, W, H);
+    markerEl.style.opacity = '1';
+  }
+
+  markerLastY = T;
+}
+
+function setGeom(l, t, w, h) {
+  markerEl.style.left   = l + 'px';
+  markerEl.style.top    = t + 'px';
+  markerEl.style.width  = w + 'px';
+  markerEl.style.height = h + 'px';
+}
+
+/* ═══════════════════════════════════════════════════════
+   ACTIVATE WORD
+   ═══════════════════════════════════════════════════════ */
+function activate(i) {
+  if (i < 0 || i >= words.length) return;
+
+  if (cursor >= 0) {
+    words[cursor].classList.remove('active');
+    words[cursor].classList.add('read');
+  }
+
+  cursor = i;
+  words[cursor].classList.remove('read');
+  words[cursor].classList.add('active');
+
+  placeMarker(words[cursor], false);
+
+  /* Progress bar */
+  var pct = ((cursor + 1) / words.length) * 100;
+  progressFill.style.width = pct + '%';
+  progressTrack.setAttribute('aria-valuenow', Math.round(pct));
+
+  syncUI();
+
+  /* Scroll into view if word is off-screen */
+  var rect = words[cursor].getBoundingClientRect();
+  if (rect.bottom > window.innerHeight - 70 || rect.top < 70) {
+    words[cursor].scrollIntoView({
+      behavior: reducedMotion ? 'auto' : 'smooth',
+      block: 'center',
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PLAYBACK ENGINE  (setTimeout-based, not rAF, so the
+   speed is user-controlled and not tied to frame rate)
+   ═══════════════════════════════════════════════════════ */
+function startPlayback() {
+  if (running) return;
+  running = true;
+  btnPlay.innerHTML = '⏸ Pause';
+
+  if (cursor >= words.length - 1) resetState(false);
+
+  scheduleTick();
+}
+
+function pause() {
+  running = false;
+  clearTimeout(timerId);
+  btnPlay.innerHTML = '▶ Play';
+}
+
+function scheduleTick() {
+  if (!running) return;
+  timerId = setTimeout(function() {
+    var next = cursor + 1;
+    if (next >= words.length) {
+      if (CONFIG.loop) { resetState(false); scheduleTick(); }
+      else             { pause(); counterEl.textContent = '✓ Complete'; }
+    } else {
+      activate(next);
+      scheduleTick();
+    }
+  }, CONFIG.speed);
+}
+
+function jumpTo(i) {
+  pause();
+  words.forEach(function(w, j) {
+    w.classList.remove('active', 'read');
+    if (j < i) w.classList.add('read');
+  });
+  cursor = i - 1;
+  activate(i);
+}
+
+function resetState(stopPlay) {
+  if (stopPlay) pause();
+  clearTimeout(timerId);
+  words.forEach(function(w) { w.classList.remove('active', 'read'); });
+  cursor = -1;
+  progressFill.style.width = '0%';
+  progressTrack.setAttribute('aria-valuenow', '0');
+  markerEl.style.transition = 'opacity 150ms ease';
+  markerEl.style.opacity = '0';
+  markerLastY = null;
+  syncUI();
+}
+
+function syncUI() {
+  counterEl.textContent = cursor < 0
+    ? '0 / ' + words.length
+    : (cursor + 1) + ' / ' + words.length;
+  btnPrev.disabled = cursor <= 0;
+  btnNext.disabled = cursor >= words.length - 1;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONTROLS
+   ═══════════════════════════════════════════════════════ */
+btnPlay.addEventListener('click', function() {
+  running ? pause() : startPlayback();
+});
+
+btnPrev.addEventListener('click', function() {
+  if (cursor <= 0) return;
+  pause();
+  words[cursor].classList.remove('active', 'read');
+  activate(cursor - 1);
+});
+
+btnNext.addEventListener('click', function() {
+  if (cursor >= words.length - 1) return;
+  pause();
+  activate(cursor + 1);
+});
+
+btnReset.addEventListener('click', function() { resetState(true); });
+
+speedSlider.addEventListener('input', function() {
+  CONFIG.speed = Number(speedSlider.value);
+  speedValEl.textContent = CONFIG.speed + 'ms';
+  document.documentElement.style.setProperty('--speed', CONFIG.speed + 'ms');
+  if (running) { clearTimeout(timerId); scheduleTick(); }
+});
+
+/* ═══════════════════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+   Space       — play / pause
+   Arrow Left  — step back one word
+   Arrow Right — step forward one word
+   R           — reset
+   ═══════════════════════════════════════════════════════ */
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.code) {
+    case 'Space':
+      e.preventDefault();
+      running ? pause() : startPlayback();
+      break;
+    case 'ArrowRight':
+      e.preventDefault();
+      if (cursor < words.length - 1) { pause(); activate(cursor + 1); }
+      break;
+    case 'ArrowLeft':
+      e.preventDefault();
+      if (cursor > 0) { pause(); activate(cursor - 1); }
+      break;
+    case 'KeyR':
+      resetState(true);
+      break;
+  }
+});
+
+/* ─── Reposition marker on window resize ───────────── */
+var resizeFrame;
+window.addEventListener('resize', function() {
+  cancelAnimationFrame(resizeFrame);
+  resizeFrame = requestAnimationFrame(function() {
+    if (cursor >= 0) placeMarker(words[cursor], true);
+  });
+});
+
+/* ─── Sync reduced-motion pref if it changes live ──── */
+window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', function(e) {
+  reducedMotion = e.matches;
+  document.body.classList.toggle('no-motion', reducedMotion);
+});
+</script>
+</body>
+</html>
