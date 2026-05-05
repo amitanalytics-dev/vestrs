@@ -1,131 +1,51 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
 
 const companies = [
-  {
-    name: 'Flipkart',
-    domain: 'flipkart.com',
-    tagline: 'Started as a two-person book delivery operation in Bangalore.',
-    outcome: 'Walmart acquisition',
-    value: '$16B',
-  },
-  {
-    name: 'Zomato',
-    domain: 'zomato.com',
-    tagline: 'Built in a market everyone said was too chaotic to win.',
-    outcome: 'IPO market cap',
-    value: '$14B',
-  },
-  {
-    name: 'Freshworks',
-    domain: 'freshworks.com',
-    tagline: 'First Indian SaaS company to list on Nasdaq. Built from Chennai.',
-    outcome: 'ARR + Nasdaq IPO',
-    value: '$1B+',
-  },
-  {
-    name: 'Zerodha',
-    domain: 'zerodha.com',
-    tagline: 'Zero external funding. Profitable from year one.',
-    outcome: 'Bootstrapped valuation',
-    value: '$3.6B',
-  },
-  {
-    name: 'Razorpay',
-    domain: 'razorpay.com',
-    tagline: 'Two IIT Roorkee graduates. Rejected by YC. Got in the next batch.',
-    outcome: 'Valuation · 8M+ businesses',
-    value: '$7.5B',
-  },
-  {
-    name: 'CRED',
-    domain: 'cred.club',
-    tagline: 'Built a premium fintech brand in a market obsessed with discounts.',
-    outcome: 'Valuation in under 5 years',
-    value: '$6.4B',
-  },
-  {
-    name: 'Nykaa',
-    domain: 'nykaa.com',
-    tagline: 'A 50-year-old founder disrupted beauty retail in India from scratch.',
-    outcome: 'IPO · profitable D2C',
-    value: '$7.4B',
-  },
-  {
-    name: 'Dream11',
-    domain: 'dream11.com',
-    tagline: 'Survived regulatory crackdowns to become India\'s first gaming unicorn.',
-    outcome: 'Valuation · profitable',
-    value: '$8B',
-  },
-  {
-    name: 'InMobi',
-    domain: 'inmobi.com',
-    tagline: "India's first unicorn. Built a global mobile ad network before mobile was mainstream.",
-    outcome: 'Valuation · 90+ countries',
-    value: '$12B',
-  },
-  {
-    name: 'Paytm',
-    domain: 'paytm.com',
-    tagline: 'Demonetisation turned a small wallet into a national financial utility overnight.',
-    outcome: '350M+ users · super-app',
-    value: '350M',
-  },
+  { name: 'Flipkart', initial: 'F', color: '#F57224', bg: '#FFF4ED', tagline: 'Two-person book delivery in Bangalore.', outcome: 'Walmart acquisition', value: '$16B' },
+  { name: 'Zomato', initial: 'Z', color: '#E23744', bg: '#FFF1F2', tagline: 'Built in a market everyone said was too chaotic.', outcome: 'IPO market cap', value: '$14B' },
+  { name: 'Freshworks', initial: 'F', color: '#25C16F', bg: '#F0FDF4', tagline: 'First Indian SaaS on Nasdaq. Built from Chennai.', outcome: 'ARR + Nasdaq IPO', value: '$1B+' },
+  { name: 'Zerodha', initial: 'Z', color: '#387ED1', bg: '#EFF6FF', tagline: 'Zero external funding. Profitable from year one.', outcome: 'Bootstrapped valuation', value: '$3.6B' },
+  { name: 'Razorpay', initial: 'R', color: '#3395FF', bg: '#EFF6FF', tagline: 'Rejected by YC. Got in the next batch.', outcome: 'Valuation · 8M+ businesses', value: '$7.5B' },
+  { name: 'CRED', initial: 'C', color: '#7C3AED', bg: '#F5F3FF', tagline: 'Premium fintech in a market obsessed with discounts.', outcome: 'Valuation in under 5 years', value: '$6.4B' },
+  { name: 'Nykaa', initial: 'N', color: '#EC4899', bg: '#FDF2F8', tagline: '50-year-old founder disrupted beauty retail.', outcome: 'IPO · profitable D2C', value: '$7.4B' },
+  { name: 'Dream11', initial: 'D', color: '#0EA5E9', bg: '#F0F9FF', tagline: 'Survived regulatory crackdowns to win the market.', outcome: "India's first gaming unicorn", value: '$8B' },
+  { name: 'InMobi', initial: 'I', color: '#0066CC', bg: '#EFF6FF', tagline: "India's first unicorn. Built before mobile was mainstream.", outcome: 'Valuation · 90+ countries', value: '$12B' },
+  { name: 'Paytm', initial: 'P', color: '#00BAF2', bg: '#F0F9FF', tagline: 'Demonetisation turned a wallet into a national utility.', outcome: '350M+ users · super-app', value: '350M' },
 ]
-
-function CompanyLogo({ name, domain }: { name: string; domain: string }) {
-  const [imgFailed, setImgFailed] = useState(false)
-
-  return (
-    <div className="relative w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-      <span className="text-white/50 font-bold text-sm z-0">{name[0]}</span>
-      {!imgFailed && (
-        <img
-          src={`https://logo.clearbit.com/${domain}`}
-          alt={name}
-          className="absolute inset-0 w-full h-full object-contain p-1.5"
-          onError={() => setImgFailed(true)}
-        />
-      )}
-    </div>
-  )
-}
 
 export default function Proof() {
   return (
-    <section id="proof" className="py-32 bg-[#051628]">
+    <section id="proof" className="py-32 bg-[#F8FAFC]">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
           className="text-center mb-4"
         >
-          <span className="text-[#0FFFC1] text-xs font-bold tracking-[0.2em] uppercase">
+          <span className="text-violet-600 text-xs font-bold tracking-[0.2em] uppercase">
             Signals, Not Exceptions
           </span>
         </motion.div>
 
-        <motion.div
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.05 }}
-          className="text-center mb-3"
+          transition={{ delay: 0.05 }}
+          className="text-4xl md:text-5xl font-bold text-center mb-3 text-[#0F172A]"
         >
-          <h2 className="text-4xl md:text-5xl font-bold">The exits have already started.</h2>
-        </motion.div>
+          The exits have already started.
+        </motion.h2>
 
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-center text-white/40 text-base mb-16"
+          transition={{ delay: 0.1 }}
+          className="text-center text-slate-400 text-base mb-16"
         >
           Ten companies. Ten proof points. One pattern.
         </motion.p>
@@ -138,22 +58,32 @@ export default function Proof() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-30px' }}
               transition={{ duration: 0.4, delay: i * 0.04 }}
-              className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-4 hover:border-[#0FFFC1]/25 hover:bg-white/[0.05] transition-all duration-300"
+              whileHover={{ y: -3, scale: 1.01 }}
+              className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md transition-all duration-300"
             >
+              {/* Brand-colored logo badge */}
               <div className="flex items-center gap-2.5 mb-3">
-                <CompanyLogo name={co.name} domain={co.domain} />
-                <span className="font-semibold text-sm truncate">{co.name}</span>
+                <div
+                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 font-black text-sm"
+                  style={{ background: co.bg, color: co.color }}
+                >
+                  {co.initial}
+                </div>
+                <span className="font-semibold text-sm text-[#0F172A] truncate">{co.name}</span>
               </div>
 
-              <p className="text-white/40 text-xs leading-relaxed mb-4 line-clamp-3">
+              <p className="text-slate-400 text-xs leading-relaxed mb-4 line-clamp-3">
                 {co.tagline}
               </p>
 
-              <div className="border-t border-white/[0.08] pt-3">
-                <div className="text-[#0FFFC1] font-black text-xl leading-none">
+              <div className="border-t border-slate-100 pt-3">
+                <div
+                  className="font-black text-xl leading-none"
+                  style={{ color: co.color }}
+                >
                   {co.value}
                 </div>
-                <div className="text-white/35 text-xs mt-1 leading-tight">{co.outcome}</div>
+                <div className="text-slate-400 text-xs mt-1 leading-tight">{co.outcome}</div>
               </div>
             </motion.div>
           ))}
@@ -164,7 +94,7 @@ export default function Proof() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center text-white/35 text-sm mt-10"
+          className="text-center text-slate-400 text-sm mt-10"
         >
           Early investors in each of these made 50x–200x. The next wave is forming now.
         </motion.p>

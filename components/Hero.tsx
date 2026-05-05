@@ -1,37 +1,28 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-import { Suspense, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-
-// ssr: false ensures no Three.js code runs on the server
-const GlobeScene = dynamic(() => import('./GlobeScene'), { ssr: false })
+import GlobeVisual from './GlobeVisual'
 
 type Star = { top: string; left: string; size: string; opacity: number }
 
 function StarField() {
   const [stars, setStars] = useState<Star[]>([])
-
-  // useEffect ensures Math.random() only runs client-side — no hydration mismatch
   useEffect(() => {
     setStars(
-      Array.from({ length: 80 }, () => ({
+      Array.from({ length: 55 }, () => ({
         top: `${Math.random() * 100}%`,
         left: `${Math.random() * 100}%`,
         size: Math.random() > 0.8 ? '2px' : '1px',
-        opacity: 0.1 + Math.random() * 0.4,
+        opacity: 0.06 + Math.random() * 0.14,
       })),
     )
   }, [])
-
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {stars.map((s, i) => (
-        <div
-          key={i}
-          className="absolute rounded-full bg-white"
-          style={{ width: s.size, height: s.size, top: s.top, left: s.left, opacity: s.opacity }}
-        />
+        <div key={i} className="absolute rounded-full bg-slate-400"
+          style={{ width: s.size, height: s.size, top: s.top, left: s.left, opacity: s.opacity }} />
       ))}
     </div>
   )
@@ -39,19 +30,22 @@ function StarField() {
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-[#030d1a]">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-[#F0FDF9] via-[#F8FAFC] to-[#EFF6FF]">
       <StarField />
 
-      <div className="absolute inset-0 bg-gradient-radial from-[#0a2440]/40 via-[#030d1a]/80 to-[#030d1a]" />
+      {/* Subtle grid */}
+      <div className="absolute inset-0 opacity-[0.025]" style={{
+        backgroundImage: 'linear-gradient(#0F172A 1px, transparent 1px), linear-gradient(90deg, #0F172A 1px, transparent 1px)',
+        backgroundSize: '60px 60px',
+      }} />
 
-      {/* Globe — client-only, falls back to empty div during SSR */}
-      <div className="absolute right-[-5%] md:right-[-2%] top-1/2 -translate-y-1/2 w-[90vw] md:w-[55vw] lg:w-[52vw] h-[90vw] md:h-[55vw] lg:h-[52vw] max-w-[750px] max-h-[750px] opacity-50 md:opacity-90">
-        <Suspense fallback={<div className="w-full h-full" />}>
-          <GlobeScene />
-        </Suspense>
+      {/* Globe — no dynamic import needed, pure SVG/framer */}
+      <div className="absolute right-[-5%] md:right-[-2%] top-1/2 -translate-y-1/2 w-[90vw] md:w-[55vw] lg:w-[52vw] h-[90vw] md:h-[55vw] lg:h-[52vw] max-w-[700px] max-h-[700px] opacity-35 md:opacity-85">
+        <GlobeVisual />
       </div>
 
-      <div className="absolute inset-0 bg-gradient-to-r from-[#030d1a] via-[#030d1a]/85 md:via-[#030d1a]/60 to-transparent pointer-events-none z-10" />
+      {/* Left fade */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#F4FDF9] via-[#F8FAFC]/80 md:via-[#F8FAFC]/55 to-transparent pointer-events-none z-10" />
 
       <div className="relative z-20 max-w-7xl mx-auto px-6 pt-28 pb-20 w-full">
         <div className="max-w-2xl">
@@ -59,9 +53,9 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-[#0FFFC1]/10 border border-[#0FFFC1]/20 rounded-full px-4 py-1.5 text-sm text-[#0FFFC1] font-medium mb-8"
+            className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-4 py-1.5 text-sm text-emerald-700 font-medium mb-8"
           >
-            <span className="w-1.5 h-1.5 bg-[#0FFFC1] rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
             Private Beta · Invite Only
           </motion.div>
 
@@ -69,19 +63,17 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-5xl md:text-6xl lg:text-[4.2rem] font-bold leading-[1.06] tracking-tight mb-6"
+            className="text-5xl md:text-6xl lg:text-[4.2rem] font-bold leading-[1.06] tracking-tight mb-6 text-[#0F172A]"
           >
             The next decade of startup wealth{' '}
-            <span className="text-[#0FFFC1]">
-              won&apos;t be created in Silicon Valley alone.
-            </span>
+            <span className="text-gradient-teal">won&apos;t be created in Silicon Valley alone.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-lg text-white/55 leading-relaxed mb-10 max-w-xl"
+            className="text-lg text-slate-500 leading-relaxed mb-10 max-w-xl"
           >
             India is producing world-class founders, category-defining companies, and
             venture-scale returns — and global capital is only beginning to notice.
@@ -94,23 +86,31 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <a
+            <motion.a
               href="#waitlist"
-              className="bg-[#0FFFC1] text-[#030d1a] font-bold px-8 py-4 rounded-full text-base hover:bg-white transition-colors duration-200 text-center"
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="relative overflow-hidden bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white font-bold px-8 py-4 rounded-full text-base group text-center shadow-lg shadow-emerald-100"
             >
-              Join the Waitlist
-            </a>
-            <a
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+              <span className="relative z-10">Join the Waitlist</span>
+            </motion.a>
+
+            <motion.a
               href="#why-india"
-              className="border border-white/20 text-white px-8 py-4 rounded-full text-base hover:border-[#0FFFC1]/50 hover:text-[#0FFFC1] transition-colors duration-200 text-center"
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="border-2 border-slate-200 text-slate-600 px-8 py-4 rounded-full text-base hover:border-emerald-300 hover:text-emerald-700 transition-colors duration-200 text-center font-medium"
             >
               Why India, Why Now ↓
-            </a>
+            </motion.a>
           </motion.div>
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#030d1a] to-transparent z-10" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#FAFAFA] to-transparent z-10" />
     </section>
   )
 }

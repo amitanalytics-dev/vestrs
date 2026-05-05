@@ -17,3 +17,5 @@ out/
 *.md
 !README.md
 next-env.d.ts
+
+.vercel
