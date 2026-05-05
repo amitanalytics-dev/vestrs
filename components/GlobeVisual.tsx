@@ -2,45 +2,48 @@
 
 import { useEffect, useRef } from 'react'
 
-const CITIES = [
-  { name: 'San Francisco', lat: 37.77,  lon: -122.42 },
-  { name: 'New York',      lat: 40.71,  lon: -74.01  },
-  { name: 'London',        lat: 51.51,  lon: -0.13   },
-  { name: 'Dubai',         lat: 25.20,  lon: 55.27   },
-  { name: 'Singapore',     lat: 1.35,   lon: 103.82  },
-]
-const INDIA = { lat: 20.59, lon: 78.96 }
-
-function ll2xyz(lat: number, lon: number, r: number): [number, number, number] {
-  const phi   = (90 - lat) * (Math.PI / 180)
-  const theta = (lon + 180) * (Math.PI / 180)
-  return [
-    -r * Math.sin(phi) * Math.cos(theta),
-     r * Math.cos(phi),
-     r * Math.sin(phi) * Math.sin(theta),
-  ]
-}
-
-// Continent outlines as [lat, lon] closed polygons
-const CONTINENT_LINES: [number, number][][] = [
-  // North America
-  [[70,-140],[60,-140],[55,-130],[50,-125],[40,-124],[35,-121],[30,-116],[25,-110],[20,-105],[15,-90],[10,-85],[8,-77],[10,-75],[15,-85],[20,-90],[25,-90],[30,-90],[33,-91],[35,-90],[40,-80],[45,-76],[50,-70],[55,-60],[60,-64],[65,-64],[70,-80],[75,-90],[75,-100],[75,-110],[75,-120],[75,-130],[75,-135],[70,-140]],
-  // South America
-  [[10,-75],[5,-77],[0,-78],[-5,-81],[-10,-78],[-15,-75],[-20,-70],[-25,-70],[-30,-71],[-35,-72],[-40,-73],[-45,-74],[-50,-73],[-55,-68],[-55,-65],[-50,-65],[-45,-64],[-40,-62],[-35,-58],[-30,-52],[-25,-48],[-20,-41],[-15,-39],[-10,-37],[-5,-35],[0,-50],[5,-52],[10,-60],[10,-65],[10,-75]],
-  // Europe
-  [[35,27],[40,28],[42,28],[44,30],[46,30],[48,32],[50,30],[52,23],[54,18],[56,14],[58,11],[60,5],[62,5],[64,14],[66,14],[68,16],[70,20],[70,26],[68,28],[65,26],[62,24],[60,25],[58,22],[55,21],[53,20],[52,16],[50,14],[48,16],[46,14],[44,12],[42,12],[40,18],[38,15],[36,14],[35,12],[35,10],[36,8],[38,8],[40,2],[42,3],[44,0],[44,-1],[43,-9],[42,-8],[40,-8],[38,-8],[37,-9],[36,-6],[36,2],[37,4],[38,8],[40,8],[38,12],[36,12],[35,27]],
-  // Africa
-  [[37,10],[35,11],[33,12],[30,31],[22,37],[15,42],[12,44],[11,43],[10,42],[8,40],[5,40],[0,42],[-5,40],[-10,40],[-15,35],[-20,34],[-25,32],[-30,30],[-34,26],[-34,18],[-30,17],[-25,15],[-20,13],[-15,12],[-10,15],[-5,10],[0,9],[5,1],[5,-1],[4,-9],[5,-15],[8,-16],[10,-15],[12,-16],[14,-17],[16,-16],[18,-16],[20,-17],[22,-17],[24,-15],[26,-15],[28,-13],[30,-12],[32,-12],[33,-7],[33,0],[32,3],[30,10],[28,14],[25,25],[22,30],[20,37],[18,38],[15,40],[12,43],[10,42],[8,38],[5,35],[5,40],[37,10]],
-  // Asia main body
-  [[70,30],[68,40],[65,50],[60,60],[55,60],[50,58],[45,60],[40,60],[35,60],[30,60],[25,57],[22,59],[20,58],[18,55],[15,50],[12,45],[10,45],[8,44],[10,42],[15,42],[22,37],[30,31],[33,35],[36,36],[38,42],[40,50],[42,48],[44,50],[46,48],[48,58],[50,58],[52,60],[54,58],[56,60],[58,58],[60,58],[65,57],[70,55],[72,70],[68,80],[62,90],[55,90],[50,90],[45,90],[40,90],[35,90],[30,100],[25,100],[20,100],[15,102],[10,104],[5,102],[0,108],[5,115],[10,120],[15,120],[18,110],[20,110],[22,114],[25,120],[28,121],[30,122],[32,118],[35,120],[38,140],[40,140],[42,138],[44,135],[48,135],[50,140],[52,140],[55,132],[58,130],[60,130],[62,170],[65,170],[68,180],[70,170],[72,180],[75,160],[78,140],[80,120],[82,100],[82,80],[80,60],[78,40],[75,30],[70,30]],
-  // Australia
-  [[-15,128],[-16,122],[-20,114],[-25,113],[-30,115],[-35,117],[-38,146],[-40,148],[-35,150],[-30,153],[-25,153],[-20,148],[-15,145],[-12,142],[-12,136],[-15,130],[-15,128]],
+/* ─── India border coordinates ─────────────────────────── */
+const IND_COORDS: [number, number][] = [
+  [35.5,76.0],[35.0,77.0],[34.5,77.5],[34.0,78.5],[33.5,79.0],[32.5,79.5],
+  [31.5,80.0],[30.5,80.5],[30.0,81.0],[29.5,81.3],[28.5,81.5],[28.0,82.5],
+  [27.5,83.5],[27.3,84.5],[27.5,85.5],[27.5,87.0],[27.0,88.0],[26.5,88.5],
+  [26.0,89.0],[25.5,89.5],[25.0,91.0],[24.5,91.5],[24.0,92.5],[23.5,93.5],
+  [25.0,94.5],[26.5,96.0],[27.5,97.5],[26.5,95.5],[25.0,94.0],
+  [23.5,92.5],[22.5,92.3],[21.5,92.2],[22.0,91.5],
+  [21.0,87.0],[19.5,85.5],[18.0,84.5],[17.0,83.0],[16.0,82.0],
+  [15.5,80.5],[15.0,80.2],[14.0,80.2],[13.5,80.5],[13.0,80.5],
+  [12.5,80.0],[11.5,79.5],[11.0,79.0],[10.5,79.0],
+  [9.5,78.5],[8.5,77.5],[8.0,77.2],[8.3,76.8],[8.5,76.5],
+  [9.0,76.5],[9.5,76.5],[10.0,76.2],[10.5,75.8],[11.0,75.5],
+  [11.5,75.0],[12.0,75.0],[12.5,74.5],[13.5,74.5],[14.0,74.5],
+  [14.5,74.0],[15.0,73.8],[15.5,73.5],[16.0,73.2],
+  [16.5,73.2],[17.0,73.5],[17.5,73.0],[18.0,72.8],
+  [19.0,72.8],[20.0,72.5],[21.0,72.0],[21.5,70.2],[22.0,68.8],[22.5,68.0],
+  [23.5,68.2],[24.0,68.8],[24.5,70.2],[24.5,70.8],
+  [25.0,70.2],[25.5,70.5],[26.0,70.5],[27.0,70.5],
+  [27.5,70.8],[28.0,70.8],[28.5,71.2],[29.5,71.2],
+  [30.0,71.8],[31.5,73.8],[32.0,74.8],[32.5,75.2],
+  [33.0,74.2],[33.5,73.8],[34.0,73.5],[34.5,74.2],
+  [35.0,75.2],[35.5,76.0],
 ]
 
-// India border highlight
-const INDIA_BORDER: [number, number][] = [
-  [22,68],[22,72],[20,72],[18,72],[16,73],[14,74],[10,76],[8,77],[8,80],[10,80],[12,80],[15,80],[16,81],[18,84],[20,87],[22,88],[23,90],[22,92],[20,93],[18,93],[16,82],[14,80],[12,79],[10,79],[8,77],[10,76],[14,74],[16,73],[18,72],[20,72],[22,72],[22,68],
+/* ─── US VC hub cities ──────────────────────────────────── */
+const VC_CITIES = [
+  { name: 'San Francisco', lat: 37.77, lng: -122.42 },
+  { name: 'Los Angeles',   lat: 34.05, lng: -118.24 },
+  { name: 'Seattle',       lat: 47.61, lng: -122.33 },
+  { name: 'Austin',        lat: 30.27, lng:  -97.74 },
+  { name: 'Chicago',       lat: 41.88, lng:  -87.63 },
+  { name: 'Boston',        lat: 42.36, lng:  -71.06 },
+  { name: 'New York',      lat: 40.71, lng:  -74.01 },
+  { name: 'Miami',         lat: 25.77, lng:  -80.19 },
 ]
+
+/* Multiple arcs per city — index into VC_CITIES */
+const ARC_SRCS = [0,0,1,1,2,2,3,4,4,5,5,6,6,6,7,7]
+
+const INDIA_CENTER = { lat: 20.59, lng: 78.96 }
+const SMIN = 0.25, SMAX = 5.30
 
 export default function GlobeVisual() {
   const mountRef = useRef<HTMLDivElement>(null)
@@ -49,214 +52,403 @@ export default function GlobeVisual() {
     const container = mountRef.current
     if (!container) return
 
-    let animId: number
-    const isMobile = window.innerWidth < 768
-    const SEG = isMobile ? 32 : 64
-    const R = 1.0
+    let animId = 0
 
-    import('three').then((THREE) => {
-      const W = container.clientWidth || 500
-      const H = container.clientHeight || 500
+    import('three').then(THREE => {
+      let W = container.clientWidth  || 500
+      let H = container.clientHeight || 500
 
-      // Renderer
-      const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: true })
+      /* Renderer */
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       renderer.setSize(W, H)
       renderer.setClearColor(0x000000, 0)
+      Object.assign(renderer.domElement.style, {
+        position: 'absolute', top: '0', left: '0', display: 'block',
+      })
       container.appendChild(renderer.domElement)
 
-      const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100)
-      camera.position.set(0, 0, 2.85)
+      /* Scene / Camera */
+      const scene  = new THREE.Scene()
+      const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000)
+      camera.position.set(0, 0, 2.6)
+      camera.lookAt(0, 0.36, 0)
+      let targetZ = 2.6
 
-      // Lights
-      scene.add(new THREE.AmbientLight(0x1a3050, 4))
-      const sun = new THREE.DirectionalLight(0x7ec8e3, 1.4)
-      sun.position.set(4, 3, 3)
+      /* Stars */
+      const sp = new Float32Array(5000 * 3)
+      for (let i = 0; i < sp.length; i++) sp[i] = (Math.random() - 0.5) * 200
+      const sg = new THREE.BufferGeometry()
+      sg.setAttribute('position', new THREE.BufferAttribute(sp, 3))
+      scene.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.11 })))
+
+      /* Globe group — all geo objects rotate together */
+      const gg = new THREE.Group()
+      scene.add(gg)
+
+      /* Earth sphere with real textures */
+      const ldr  = new THREE.TextureLoader()
+      const eMat = new THREE.MeshPhongMaterial({
+        map:         ldr.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
+        bumpMap:     ldr.load('https://unpkg.com/three-globe/example/img/earth-topology.png'),
+        bumpScale:   0.04,
+        specularMap: ldr.load('https://unpkg.com/three-globe/example/img/earth-water.png'),
+        specular:    new THREE.Color(0x1a2244),
+        shininess:   22,
+      })
+      gg.add(new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), eMat))
+
+      /* Thin atmosphere tint */
+      gg.add(new THREE.Mesh(
+        new THREE.SphereGeometry(1.028, 32, 32),
+        new THREE.MeshPhongMaterial({ color: 0x3366ff, transparent: true, opacity: 0.07 }),
+      ))
+
+      /* Lights */
+      scene.add(new THREE.AmbientLight(0x334455, 0.9))
+      const sun = new THREE.DirectionalLight(0xffeedd, 1.3)
+      sun.position.set(5, 3, 5)
       scene.add(sun)
 
-      // Globe body
-      const globeMat = new THREE.MeshPhongMaterial({
-        color: 0x071828,
-        emissive: 0x030e18,
-        shininess: 20,
-      })
-      const globe = new THREE.Mesh(new THREE.SphereGeometry(R, SEG, SEG), globeMat)
-      scene.add(globe)
+      /* lat/lng → Vector3 helper */
+      function ll(lat: number, lng: number, r = 1.013) {
+        const phi   = (90 - lat) * (Math.PI / 180)
+        const theta = (lng + 180) * (Math.PI / 180)
+        return new THREE.Vector3(
+          -r * Math.sin(phi) * Math.cos(theta),
+           r * Math.cos(phi),
+           r * Math.sin(phi) * Math.sin(theta),
+        )
+      }
 
-      // Atmosphere glow (Fresnel, BackSide)
-      const atmosMat = new THREE.ShaderMaterial({
-        side: THREE.BackSide,
-        transparent: true,
-        depthWrite: false,
-        uniforms: { c: { value: new THREE.Color(0x0ea5e9) } },
-        vertexShader: `
-          varying float vI;
-          void main() {
-            vec3 n = normalize(normalMatrix * normal);
-            vec3 e = normalize(vec3(modelViewMatrix * vec4(position, 1.0)));
-            vI = pow(0.75 - dot(n, e), 2.5);
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }`,
-        fragmentShader: `
-          uniform vec3 c;
-          varying float vI;
-          void main() { gl_FragColor = vec4(c, vI * 0.55); }`,
-      })
-      scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.07, SEG, SEG), atmosMat))
+      /* India tricolour overlay painted onto a canvas texture */
+      ;(function buildIndiaMesh() {
+        const OW = 2048, OH = 1024
+        const oc  = document.createElement('canvas')
+        oc.width = OW; oc.height = OH
+        const ctx = oc.getContext('2d')!
+        const xy  = (lat: number, lng: number): [number, number] =>
+          [(lng + 180) / 360 * OW, (90 - lat) / 180 * OH]
 
-      // Group for all geo objects (rotation applies here)
-      const geoGroup = new THREE.Group()
-      scene.add(geoGroup)
-
-      // Continent lines
-      const cLineMat = new THREE.LineBasicMaterial({ color: 0x1d4a6a, transparent: true, opacity: 0.65 })
-      CONTINENT_LINES.forEach((pts) => {
-        const verts: number[] = []
-        pts.forEach(([lat, lon]) => {
-          const [x, y, z] = ll2xyz(lat, lon, R + 0.001)
-          verts.push(x, y, z)
+        ctx.beginPath()
+        IND_COORDS.forEach(([lat, lng], i) => {
+          const [x, y] = xy(lat, lng)
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
         })
-        const geo = new THREE.BufferGeometry()
-        geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3))
-        geoGroup.add(new THREE.Line(geo, cLineMat))
-      })
+        ctx.closePath()
+        ctx.save()
+        ctx.clip()
 
-      // India border highlighted
-      const indiaLineMat = new THREE.LineBasicMaterial({ color: 0x10b981, transparent: true, opacity: 1 })
-      const indiaVerts: number[] = []
-      INDIA_BORDER.forEach(([lat, lon]) => {
-        const [x, y, z] = ll2xyz(lat, lon, R + 0.003)
-        indiaVerts.push(x, y, z)
-      })
-      const indiaGeo = new THREE.BufferGeometry()
-      indiaGeo.setAttribute('position', new THREE.Float32BufferAttribute(indiaVerts, 3))
-      geoGroup.add(new THREE.Line(indiaGeo, indiaLineMat))
+        const y1 = xy(27.33, 0)[1]
+        const y2 = xy(17.67, 0)[1]
+        ctx.fillStyle = '#FF9933'; ctx.fillRect(0,  0,  OW, y1)
+        ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,  y1, OW, y2 - y1)
+        ctx.fillStyle = '#138808'; ctx.fillRect(0,  y2, OW, OH - y2)
+        ctx.restore()
 
-      // India point light + dot + ring
-      const [ix, iy, iz] = ll2xyz(INDIA.lat, INDIA.lon, R)
-      const indiaLight = new THREE.PointLight(0x10b981, 3, 1.2)
-      indiaLight.position.set(ix, iy, iz)
-      geoGroup.add(indiaLight)
+        const tex = new THREE.CanvasTexture(oc)
+        tex.needsUpdate = true
+        const mesh = new THREE.Mesh(
+          new THREE.SphereGeometry(1.005, 64, 64),
+          new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.1 }),
+        )
+        mesh.renderOrder = 1
+        gg.add(mesh)
+      }())
 
-      const indiaDot = new THREE.Mesh(
-        new THREE.SphereGeometry(0.02, 10, 10),
-        new THREE.MeshBasicMaterial({ color: 0x10b981 }),
+      /* India hub dot + 3 glow rings */
+      const INDP = ll(INDIA_CENTER.lat, INDIA_CENTER.lng, 1.013)
+      const idot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.022, 12, 12),
+        new THREE.MeshBasicMaterial({ color: 0xff9922 }),
       )
-      indiaDot.position.set(ix, iy, iz)
-      geoGroup.add(indiaDot)
+      idot.position.copy(INDP)
+      idot.userData = { name: 'India' }
+      gg.add(idot)
 
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
-      const ring = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.068, 32), ringMat)
-      ring.position.set(ix, iy, iz)
-      ring.lookAt(new THREE.Vector3(ix * 3, iy * 3, iz * 3))
-      geoGroup.add(ring)
-
-      // Source city dots
-      const cityMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
-      CITIES.forEach((city) => {
-        const [cx, cy, cz] = ll2xyz(city.lat, city.lon, R + 0.003)
-        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.013, 8, 8), cityMat)
-        dot.position.set(cx, cy, cz)
-        geoGroup.add(dot)
+      ;([
+        [0.030, 0.038, 0.55],
+        [0.044, 0.053, 0.30],
+        [0.062, 0.072, 0.14],
+      ] as [number, number, number][]).forEach(([r0, r1, op]) => {
+        const ring = new THREE.Mesh(
+          new THREE.RingGeometry(r0, r1, 28),
+          new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: op, side: THREE.DoubleSide }),
+        )
+        ring.position.copy(INDP)
+        ring.lookAt(INDP.clone().multiplyScalar(2))
+        gg.add(ring)
       })
 
-      // Arcs + animated particles
-      type ArcParticle = { mesh: InstanceType<typeof THREE.Mesh>; curve: InstanceType<typeof THREE.QuadraticBezierCurve3>; t: number; speed: number }
-      const particles: ArcParticle[] = []
-      const arcLineMat = new THREE.LineBasicMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.20 })
+      /* "INDIA" floating label */
+      const ilbl = document.createElement('div')
+      ilbl.textContent = 'INDIA'
+      Object.assign(ilbl.style, {
+        position: 'absolute', pointerEvents: 'none',
+        fontSize: '14px', fontWeight: '700',
+        whiteSpace: 'nowrap', letterSpacing: '.1em',
+        textShadow: '0 0 12px #000, 0 1px 5px #000',
+        color: '#ffaa33', opacity: '0',
+        fontFamily: 'system-ui, sans-serif',
+      })
+      container.appendChild(ilbl)
 
-      CITIES.forEach((city, i) => {
-        const [sx, sy, sz] = ll2xyz(city.lat, city.lon, R)
-        const [ex, ey, ez] = ll2xyz(INDIA.lat, INDIA.lon, R)
-        const mid = new THREE.Vector3((sx + ex) / 2, (sy + ey) / 2, (sz + ez) / 2)
-        mid.normalize().multiplyScalar(R * 1.5)
-        const curve = new THREE.QuadraticBezierCurve3(
-          new THREE.Vector3(sx, sy, sz), mid, new THREE.Vector3(ex, ey, ez),
-        )
-        const linePts = curve.getPoints(60)
-        const lineGeo = new THREE.BufferGeometry().setFromPoints(linePts)
-        geoGroup.add(new THREE.Line(lineGeo, arcLineMat))
+      /* US city dots + labels */
+      type LabelItem = { el: HTMLDivElement; pos: ReturnType<typeof ll>; name: string }
+      type TMesh = InstanceType<typeof THREE.Mesh>
+      const cityMeshes: TMesh[] = [idot as TMesh]
+      const vcLabels: LabelItem[]   = []
 
-        const pMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(0.013, 6, 6),
-          new THREE.MeshBasicMaterial({ color: 0x7dd3fc }),
+      VC_CITIES.forEach(c => {
+        const pos = ll(c.lat, c.lng, 1.013)
+
+        const dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.014, 10, 10),
+          new THREE.MeshBasicMaterial({ color: 0x55ddff }),
         )
-        geoGroup.add(pMesh)
-        particles.push({ mesh: pMesh, curve, t: i * 0.2, speed: 0.0014 + i * 0.0002 })
+        dot.position.copy(pos)
+        dot.userData = { name: c.name }
+        gg.add(dot)
+        cityMeshes.push(dot)
+
+        const ring = new THREE.Mesh(
+          new THREE.RingGeometry(0.020, 0.027, 20),
+          new THREE.MeshBasicMaterial({ color: 0xaaeeff, transparent: true, opacity: 0.35, side: THREE.DoubleSide }),
+        )
+        ring.position.copy(pos)
+        ring.lookAt(pos.clone().multiplyScalar(2))
+        gg.add(ring)
+
+        const el = document.createElement('div')
+        el.textContent = c.name
+        Object.assign(el.style, {
+          position: 'absolute', pointerEvents: 'none',
+          fontSize: '11px', fontWeight: '500',
+          whiteSpace: 'nowrap', paddingLeft: '9px',
+          textShadow: '0 0 8px #000, 0 1px 4px #000',
+          color: '#7dd8ff', opacity: '0',
+          fontFamily: 'system-ui, sans-serif',
+        })
+        container.appendChild(el)
+        vcLabels.push({ el, pos, name: c.name })
       })
 
-      // Orient so India faces camera on load
-      geoGroup.rotation.y = (-INDIA.lon - 90) * (Math.PI / 180)
-      geoGroup.rotation.x = -INDIA.lat * 0.012
-
-      // Drag state
-      let dragging = false
-      let px = 0; let py = 0
-      let vx = 0; let vy = 0
-
-      const onDown = (x: number, y: number) => { dragging = true; px = x; py = y; vx = 0; vy = 0 }
-      const onMove = (x: number, y: number) => {
-        if (!dragging) return
-        vx = (x - px) * 0.005; vy = (y - py) * 0.003
-        px = x; py = y
+      /* Animated arcs: US cities → India */
+      type ArcObj = {
+        geo: InstanceType<typeof THREE.BufferGeometry>
+        mat: InstanceType<typeof THREE.LineBasicMaterial>
+        totalPts: number
+        progress: number
+        speed: number
       }
-      const onUp = () => { dragging = false }
+      const arcObjs: ArcObj[] = ARC_SRCS.map((vi, idx) => {
+        const city = VC_CITIES[vi]
+        const s    = ll(city.lat, city.lng, 1.01)
+        const e    = ll(INDIA_CENTER.lat, INDIA_CENTER.lng, 1.01)
+        const jitter = (idx % 3) * 0.04 - 0.04
+        const mid  = s.clone().add(e).multiplyScalar(0.5).normalize().multiplyScalar(2.0 + jitter)
+        const curve = new THREE.QuadraticBezierCurve3(s, mid, e)
+        const PTS   = 100
+        const geo   = new THREE.BufferGeometry().setFromPoints(curve.getPoints(PTS))
+        geo.setDrawRange(0, 0)
+        const mat = new THREE.LineBasicMaterial({
+          color: 0xffee44, transparent: true, opacity: 0.88, depthTest: false,
+        })
+        gg.add(new THREE.Line(geo, mat))
+        return { geo, mat, totalPts: PTS + 1, progress: idx / ARC_SRCS.length, speed: 0.18 + Math.random() * 0.14 }
+      })
 
-      renderer.domElement.addEventListener('mousedown', (e) => onDown(e.clientX, e.clientY))
-      window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY))
-      window.addEventListener('mouseup', onUp)
-      renderer.domElement.addEventListener('touchstart', (e) => onDown(e.touches[0].clientX, e.touches[0].clientY), { passive: true })
-      window.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), { passive: true })
-      window.addEventListener('touchend', onUp)
+      /* Swing rotation state — starts with India centred */
+      let sDir = 1
+      gg.rotation.y = Math.PI
 
-      const onResize = () => {
-        const w = container.clientWidth; const h = container.clientHeight
-        renderer.setSize(w, h)
-        camera.aspect = w / h
-        camera.updateProjectionMatrix()
+      /* Interaction */
+      let drag = false
+      let pMx = 0, pMy = 0, velX = 0, velY = 0
+      let pTouch: { x: number; y: number } | null = null
+
+      const onMouseDown = (e: MouseEvent) => {
+        drag = true; pMx = e.clientX; pMy = e.clientY; velX = 0; velY = 0
+        container.style.cursor = 'grabbing'
       }
-      window.addEventListener('resize', onResize)
-
-      let tick = 0
-      const loop = () => {
-        animId = requestAnimationFrame(loop)
-        tick += 0.016
-
-        if (dragging) {
-          geoGroup.rotation.y += vx
-          geoGroup.rotation.x = Math.max(-0.9, Math.min(0.9, geoGroup.rotation.x + vy))
+      const onMouseMove = (e: MouseEvent) => {
+        const r = container.getBoundingClientRect()
+        if (drag) {
+          const dx = e.clientX - pMx, dy = e.clientY - pMy
+          gg.rotation.y += dx * 0.006
+          gg.rotation.x  = Math.max(-1.3, Math.min(1.3, gg.rotation.x + dy * 0.006))
+          velX = dy * 0.0008; velY = dx * 0.0008
+          pMx = e.clientX; pMy = e.clientY
         } else {
-          vx *= 0.92; vy *= 0.92
-          geoGroup.rotation.y += vx + 0.0018
-          geoGroup.rotation.x = Math.max(-0.9, Math.min(0.9, geoGroup.rotation.x + vy))
+          /* Tooltip raycasting */
+          m2.x = ((e.clientX - r.left) / W) * 2 - 1
+          m2.y = -((e.clientY - r.top)  / H) * 2 + 1
+          ray.setFromCamera(m2, camera)
+          const hits = ray.intersectObjects(cityMeshes)
+          if (hits.length) {
+            tipEl.style.display = 'block'
+            tipEl.style.left = (e.clientX - r.left + 14) + 'px'
+            tipEl.style.top  = (e.clientY - r.top  -  8) + 'px'
+            tipEl.textContent = hits[0].object.userData.name as string
+          } else {
+            tipEl.style.display = 'none'
+          }
+        }
+      }
+      const onMouseUp = () => {
+        drag = false; container.style.cursor = 'grab'
+        if (gg.rotation.y > SMAX) sDir = -1
+        else if (gg.rotation.y < SMIN) sDir = 1
+      }
+      const onWheel = (e: WheelEvent) => {
+        e.preventDefault()
+        targetZ = Math.max(1.5, Math.min(5.5, targetZ + e.deltaY * 0.005))
+      }
+      const onTouchStart = (e: TouchEvent) => {
+        pTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+        velX = 0; velY = 0
+      }
+      const onTouchMove = (e: TouchEvent) => {
+        if (!pTouch) return
+        e.preventDefault()
+        const dx = e.touches[0].clientX - pTouch.x
+        const dy = e.touches[0].clientY - pTouch.y
+        gg.rotation.y += dx * 0.006
+        gg.rotation.x  = Math.max(-1.3, Math.min(1.3, gg.rotation.x + dy * 0.006))
+        velX = dy * 0.0008; velY = dx * 0.0008
+        pTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      }
+      const onTouchEnd = () => { pTouch = null }
+
+      container.addEventListener('mousedown', onMouseDown)
+      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener('mouseup', onMouseUp)
+      container.addEventListener('wheel', onWheel, { passive: false })
+      container.addEventListener('touchstart', onTouchStart, { passive: true })
+      container.addEventListener('touchmove', onTouchMove, { passive: false })
+      container.addEventListener('touchend', onTouchEnd)
+
+      /* Tooltip element */
+      const tipEl = document.createElement('div')
+      Object.assign(tipEl.style, {
+        position: 'absolute', display: 'none',
+        background: 'rgba(0,0,0,.82)', color: '#fff',
+        padding: '4px 10px', borderRadius: '6px',
+        fontSize: '12px', pointerEvents: 'none',
+        whiteSpace: 'nowrap', border: '.5px solid rgba(255,255,255,.15)',
+        fontFamily: 'system-ui, sans-serif',
+      })
+      container.appendChild(tipEl)
+
+      const ray = new THREE.Raycaster()
+      const m2  = new THREE.Vector2()
+
+      /* Resize observer */
+      const ro = new ResizeObserver(() => {
+        W = container.clientWidth; H = container.clientHeight
+        renderer.setSize(W, H)
+        camera.aspect = W / H
+        camera.updateProjectionMatrix()
+      })
+      ro.observe(container)
+
+      /* Animation loop */
+      let lt = performance.now()
+      const animate = () => {
+        animId = requestAnimationFrame(animate)
+        const now = performance.now()
+        const dt  = Math.min((now - lt) / 1000, 0.05)
+        lt = now
+
+        /* Globe auto-rotation with swing bounce */
+        if (!drag && !pTouch) {
+          gg.rotation.y += 0.0025 * sDir + velY
+          gg.rotation.x  = Math.max(-1.3, Math.min(1.3, gg.rotation.x + velX))
+          velX *= 0.96; velY *= 0.96
+          if (gg.rotation.y >= SMAX) { gg.rotation.y = SMAX; sDir = -1; velY = 0 }
+          else if (gg.rotation.y <= SMIN) { gg.rotation.y = SMIN; sDir = 1; velY = 0 }
         }
 
-        // Pulse India ring
-        const p = 0.8 + 0.2 * Math.sin(tick * 3)
-        ring.scale.setScalar(p)
-        ringMat.opacity = p * 0.85
-
-        // Animate particles
-        particles.forEach((ap) => {
-          ap.t = (ap.t + ap.speed) % 1
-          ap.mesh.position.copy(ap.curve.getPoint(ap.t))
+        /* Arc animation */
+        arcObjs.forEach(a => {
+          a.progress += a.speed * dt
+          if (a.progress > 1) a.progress = 0
+          const WIN = 0.20, head = a.progress, tail = Math.max(0, head - WIN)
+          a.geo.setDrawRange(
+            Math.floor(tail * a.totalPts),
+            Math.max(0, Math.floor((head - tail) * a.totalPts)),
+          )
+          const fi = Math.min(1, head / 0.05)
+          const fo = head > 0.88 ? Math.max(0, (1 - head) / 0.12) : 1
+          a.mat.opacity = 0.90 * fi * fo
         })
 
-        renderer.render(scene, camera)
-      }
-      loop()
+        /* Smooth camera zoom */
+        camera.position.z += (targetZ - camera.position.z) * 0.1
 
-      // Cleanup
+        renderer.render(scene, camera)
+
+        /* Floating labels — project 3D → 2D with anti-overlap */
+        gg.updateMatrixWorld()
+        const cd = camera.position.clone().normalize()
+        const placed: { x: number; y: number; w: number; h: number }[] = []
+
+        /* India label */
+        const wpI  = INDP.clone().applyMatrix4(gg.matrixWorld)
+        const facI = wpI.clone().normalize().dot(cd)
+        if (facI >= 0.12) {
+          const p  = wpI.clone().project(camera)
+          const sx = ((p.x + 1) / 2) * W
+          const sy = ((-p.y + 1) / 2) * H
+          ilbl.style.left    = sx + 'px'
+          ilbl.style.top     = (sy - 6) + 'px'
+          ilbl.style.opacity = Math.min(1, (facI - 0.12) / 0.15).toFixed(2)
+          placed.push({ x: sx, y: sy, w: 60, h: 18 })
+        } else {
+          ilbl.style.opacity = '0'
+        }
+
+        /* City labels with overlap suppression */
+        vcLabels.forEach(item => {
+          const wp  = item.pos.clone().applyMatrix4(gg.matrixWorld)
+          const fac = wp.clone().normalize().dot(cd)
+          if (fac < 0.10) { item.el.style.opacity = '0'; return }
+          const p  = wp.clone().project(camera)
+          const sx = ((p.x + 1) / 2) * W
+          const sy = ((-p.y + 1) / 2) * H
+          const op = Math.min(1, (fac - 0.10) / 0.18)
+          const lw = item.name.length * 7
+          const overlaps = placed.some(
+            q => Math.abs(sx - q.x) < (lw + q.w) / 2 + 10 && Math.abs(sy - q.y) < (14 + q.h) / 2 + 6,
+          )
+          if (!overlaps) {
+            item.el.style.left    = sx + 'px'
+            item.el.style.top     = (sy - 6) + 'px'
+            item.el.style.opacity = op.toFixed(2)
+            placed.push({ x: sx, y: sy, w: lw, h: 14 })
+          } else {
+            item.el.style.opacity = '0'
+          }
+        })
+      }
+      animate()
+
+      /* Cleanup stored on container */
       const cleanup = () => {
         cancelAnimationFrame(animId)
-        window.removeEventListener('mousemove', onMove as never)
-        window.removeEventListener('mouseup', onUp)
-        window.removeEventListener('touchmove', onMove as never)
-        window.removeEventListener('touchend', onUp)
-        window.removeEventListener('resize', onResize)
+        ro.disconnect()
+        container.removeEventListener('mousedown', onMouseDown)
+        window.removeEventListener('mousemove', onMouseMove)
+        window.removeEventListener('mouseup', onMouseUp)
+        container.removeEventListener('wheel', onWheel)
+        container.removeEventListener('touchstart', onTouchStart)
+        container.removeEventListener('touchmove', onTouchMove)
+        container.removeEventListener('touchend', onTouchEnd)
         renderer.dispose()
         if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement)
+        if (container.contains(ilbl)) container.removeChild(ilbl)
+        if (container.contains(tipEl)) container.removeChild(tipEl)
+        vcLabels.forEach(item => { if (container.contains(item.el)) container.removeChild(item.el) })
       }
       ;(container as HTMLDivElement & { _gc?: () => void })._gc = cleanup
     })
@@ -268,5 +460,11 @@ export default function GlobeVisual() {
     }
   }, [])
 
-  return <div ref={mountRef} className="w-full h-full" style={{ cursor: 'grab' }} />
+  return (
+    <div
+      ref={mountRef}
+      className="relative w-full h-full"
+      style={{ cursor: 'grab' }}
+    />
+  )
 }
