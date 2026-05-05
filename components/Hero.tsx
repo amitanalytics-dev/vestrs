@@ -3,8 +3,8 @@
 import dynamic from 'next/dynamic'
 import { Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import ErrorBoundary from './ErrorBoundary'
 
+// ssr: false ensures no Three.js code runs on the server
 const GlobeScene = dynamic(() => import('./GlobeScene'), { ssr: false })
 
 type Star = { top: string; left: string; size: string; opacity: number }
@@ -12,14 +12,16 @@ type Star = { top: string; left: string; size: string; opacity: number }
 function StarField() {
   const [stars, setStars] = useState<Star[]>([])
 
+  // useEffect ensures Math.random() only runs client-side — no hydration mismatch
   useEffect(() => {
-    const s: Star[] = Array.from({ length: 80 }, () => ({
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      size: Math.random() > 0.8 ? '2px' : '1px',
-      opacity: 0.1 + Math.random() * 0.4,
-    }))
-    setStars(s)
+    setStars(
+      Array.from({ length: 80 }, () => ({
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        size: Math.random() > 0.8 ? '2px' : '1px',
+        opacity: 0.1 + Math.random() * 0.4,
+      })),
+    )
   }, [])
 
   return (
@@ -40,22 +42,17 @@ export default function Hero() {
     <section className="relative min-h-screen flex items-center overflow-hidden bg-[#030d1a]">
       <StarField />
 
-      {/* Background radial */}
       <div className="absolute inset-0 bg-gradient-radial from-[#0a2440]/40 via-[#030d1a]/80 to-[#030d1a]" />
 
-      {/* Globe */}
+      {/* Globe — client-only, falls back to empty div during SSR */}
       <div className="absolute right-[-5%] md:right-[-2%] top-1/2 -translate-y-1/2 w-[90vw] md:w-[55vw] lg:w-[52vw] h-[90vw] md:h-[55vw] lg:h-[52vw] max-w-[750px] max-h-[750px] opacity-50 md:opacity-90">
-        <ErrorBoundary fallback={<div className="w-full h-full" />}>
-          <Suspense fallback={<div className="w-full h-full" />}>
-            <GlobeScene />
-          </Suspense>
-        </ErrorBoundary>
+        <Suspense fallback={<div className="w-full h-full" />}>
+          <GlobeScene />
+        </Suspense>
       </div>
 
-      {/* Left fade */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#030d1a] via-[#030d1a]/85 md:via-[#030d1a]/60 to-transparent pointer-events-none z-10" />
 
-      {/* Content */}
       <div className="relative z-20 max-w-7xl mx-auto px-6 pt-28 pb-20 w-full">
         <div className="max-w-2xl">
           <motion.div
@@ -113,7 +110,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#030d1a] to-transparent z-10" />
     </section>
   )
