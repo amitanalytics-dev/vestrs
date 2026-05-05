@@ -1,24 +1,55 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import ErrorBoundary from './ErrorBoundary'
 
-const GlobeScene = dynamic(() => import('./GlobeScene'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full rounded-full bg-[#051628]/50 animate-pulse" />
-  ),
-})
+const GlobeScene = dynamic(() => import('./GlobeScene'), { ssr: false })
+
+type Star = { top: string; left: string; size: string; opacity: number }
+
+function StarField() {
+  const [stars, setStars] = useState<Star[]>([])
+
+  useEffect(() => {
+    const s: Star[] = Array.from({ length: 80 }, () => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: Math.random() > 0.8 ? '2px' : '1px',
+      opacity: 0.1 + Math.random() * 0.4,
+    }))
+    setStars(s)
+  }, [])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {stars.map((s, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full bg-white"
+          style={{ width: s.size, height: s.size, top: s.top, left: s.left, opacity: s.opacity }}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-[#030d1a]">
+      <StarField />
+
       {/* Background radial */}
       <div className="absolute inset-0 bg-gradient-radial from-[#0a2440]/40 via-[#030d1a]/80 to-[#030d1a]" />
 
       {/* Globe */}
       <div className="absolute right-[-5%] md:right-[-2%] top-1/2 -translate-y-1/2 w-[90vw] md:w-[55vw] lg:w-[52vw] h-[90vw] md:h-[55vw] lg:h-[52vw] max-w-[750px] max-h-[750px] opacity-50 md:opacity-90">
-        <GlobeScene />
+        <ErrorBoundary fallback={<div className="w-full h-full" />}>
+          <Suspense fallback={<div className="w-full h-full" />}>
+            <GlobeScene />
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       {/* Left fade */}

@@ -2,7 +2,6 @@
 
 import { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Stars } from '@react-three/drei'
 import * as THREE from 'three'
 
 const RADIUS = 2.2
@@ -20,11 +19,11 @@ function latLng(lat: number, lng: number, r = RADIUS): THREE.Vector3 {
 const INDIA = latLng(20.5, 78.9)
 
 const SOURCES = [
-  latLng(37.7, -122.4), // San Francisco
-  latLng(40.7, -74.0),  // New York
-  latLng(51.5, -0.1),   // London
-  latLng(1.35, 103.8),  // Singapore
-  latLng(25.2, 55.3),   // Dubai
+  latLng(37.7, -122.4),
+  latLng(40.7, -74.0),
+  latLng(51.5, -0.1),
+  latLng(1.35, 103.8),
+  latLng(25.2, 55.3),
 ]
 
 function FlowLine({ from, offset }: { from: THREE.Vector3; offset: number }) {
@@ -70,11 +69,9 @@ function IndiaGlow({ position }: { position: THREE.Vector3 }) {
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
-    const scale = 1 + 0.4 * Math.sin(t * 1.6)
-    const opacity = 0.1 + 0.08 * Math.sin(t * 1.6)
-    outerRef.current.scale.setScalar(scale)
+    outerRef.current.scale.setScalar(1 + 0.4 * Math.sin(t * 1.6))
     const mat = outerRef.current.material as THREE.MeshBasicMaterial
-    mat.opacity = opacity
+    mat.opacity = 0.1 + 0.08 * Math.sin(t * 1.6)
   })
 
   return (
@@ -137,7 +134,6 @@ export default function GlobeScene() {
       gl={{ antialias: true, alpha: true }}
       style={{ background: 'transparent' }}
     >
-      <Stars radius={80} depth={40} count={3000} factor={3} saturation={0} fade={true} speed={0.5} />
       <ambientLight intensity={0.35} />
       <directionalLight position={[5, 5, 5]} intensity={0.7} />
       <GlobeObject />
