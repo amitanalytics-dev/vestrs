@@ -1,49 +1,93 @@
 'use client'
-
 import { useEffect, useRef } from 'react'
 
-/* ─── India border coordinates ─────────────────────────── */
-const IND_COORDS: [number, number][] = [
-  [35.5,76.0],[35.0,77.0],[34.5,77.5],[34.0,78.5],[33.5,79.0],[32.5,79.5],
-  [31.5,80.0],[30.5,80.5],[30.0,81.0],[29.5,81.3],[28.5,81.5],[28.0,82.5],
-  [27.5,83.5],[27.3,84.5],[27.5,85.5],[27.5,87.0],[27.0,88.0],[26.5,88.5],
-  [26.0,89.0],[25.5,89.5],[25.0,91.0],[24.5,91.5],[24.0,92.5],[23.5,93.5],
-  [25.0,94.5],[26.5,96.0],[27.5,97.5],[26.5,95.5],[25.0,94.0],
-  [23.5,92.5],[22.5,92.3],[21.5,92.2],[22.0,91.5],
+const IND: [number, number][] = [
+  [35.5,76.0],[34.5,77.5],[33.0,79.0],[31.5,80.0],[30.0,81.0],[28.5,81.5],
+  [27.5,83.5],[27.3,85.0],[27.5,87.0],[27.0,88.0],[26.5,89.0],
+  [25.0,91.0],[24.5,92.0],[23.5,93.5],[22.0,92.5],
   [21.0,87.0],[19.5,85.5],[18.0,84.5],[17.0,83.0],[16.0,82.0],
-  [15.5,80.5],[15.0,80.2],[14.0,80.2],[13.5,80.5],[13.0,80.5],
-  [12.5,80.0],[11.5,79.5],[11.0,79.0],[10.5,79.0],
-  [9.5,78.5],[8.5,77.5],[8.0,77.2],[8.3,76.8],[8.5,76.5],
-  [9.0,76.5],[9.5,76.5],[10.0,76.2],[10.5,75.8],[11.0,75.5],
-  [11.5,75.0],[12.0,75.0],[12.5,74.5],[13.5,74.5],[14.0,74.5],
-  [14.5,74.0],[15.0,73.8],[15.5,73.5],[16.0,73.2],
-  [16.5,73.2],[17.0,73.5],[17.5,73.0],[18.0,72.8],
-  [19.0,72.8],[20.0,72.5],[21.0,72.0],[21.5,70.2],[22.0,68.8],[22.5,68.0],
-  [23.5,68.2],[24.0,68.8],[24.5,70.2],[24.5,70.8],
-  [25.0,70.2],[25.5,70.5],[26.0,70.5],[27.0,70.5],
-  [27.5,70.8],[28.0,70.8],[28.5,71.2],[29.5,71.2],
-  [30.0,71.8],[31.5,73.8],[32.0,74.8],[32.5,75.2],
-  [33.0,74.2],[33.5,73.8],[34.0,73.5],[34.5,74.2],
-  [35.0,75.2],[35.5,76.0],
+  [15.5,80.5],[13.5,80.5],[12.5,80.0],[10.5,79.0],
+  [8.5,77.5],[8.0,77.0],[8.5,76.5],
+  [10.5,76.0],[12.0,75.0],[14.5,74.0],[16.5,73.5],[18.0,72.8],
+  [20.0,72.5],[21.0,72.0],[22.0,68.8],[22.5,68.0],
+  [25.0,70.0],[27.5,70.8],[30.0,71.5],
+  [32.5,75.0],[34.5,74.0],[35.5,76.0],
 ]
 
-/* ─── US VC hub cities ──────────────────────────────────── */
-const VC_CITIES = [
-  { name: 'San Francisco', lat: 37.77, lng: -122.42 },
-  { name: 'Los Angeles',   lat: 34.05, lng: -118.24 },
-  { name: 'Seattle',       lat: 47.61, lng: -122.33 },
-  { name: 'Austin',        lat: 30.27, lng:  -97.74 },
-  { name: 'Chicago',       lat: 41.88, lng:  -87.63 },
-  { name: 'Boston',        lat: 42.36, lng:  -71.06 },
-  { name: 'New York',      lat: 40.71, lng:  -74.01 },
-  { name: 'Miami',         lat: 25.77, lng:  -80.19 },
+// [name, industry, multiple, brandColor]
+const UNICORNS: [string, string, string, string][] = [
+  ['Flipkart',     'E-commerce',  '400x', '#1e88e5'],
+  ['Paytm',        'Fintech',     '30x',  '#1a6fc4'],
+  ['Ola',          'Mobility',    '25x',  '#555555'],
+  ["BYJU'S",       'Edtech',      '80x',  '#0b3d91'],
+  ['Dream11',      'Gaming',      '50x',  '#e63946'],
+  ['Swiggy',       'Foodtech',    '20x',  '#fc8019'],
+  ['Zomato',       'Foodtech',    '200x', '#e23744'],
+  ['Razorpay',     'Fintech',     '150x', '#2eb5c1'],
+  ['CRED',         'Fintech',     '8x',   '#6366f1'],
+  ['Meesho',       'E-commerce',  '80x',  '#9b5de5'],
+  ['Nykaa',        'Beauty',      '100x', '#fc4f8c'],
+  ['PolicyBazaar', 'Insurtech',   '100x', '#ef4444'],
+  ['PhonePe',      'Fintech',     '40x',  '#7c3aed'],
+  ['Groww',        'Fintech',     '20x',  '#00b386'],
+  ['Zepto',        'Q-Commerce',  '30x',  '#a855f7'],
+  ['BharatPe',     'Fintech',     '10x',  '#e8192c'],
+  ['Unacademy',    'Edtech',      '12x',  '#0880ae'],
+  ['Vedantu',      'Edtech',      '15x',  '#4d5cde'],
+  ['ShareChat',    'Social',      '30x',  '#f7a51e'],
+  ['Slice',        'Fintech',     '20x',  '#f0522b'],
+  ['Darwinbox',    'HR Tech',     '25x',  '#1d4ed8'],
+  ['Chargebee',    'SaaS',        '40x',  '#f97316'],
+  ['Freshworks',   'SaaS',        '500x', '#25c16f'],
+  ['InMobi',       'Adtech',      '30x',  '#ff5733'],
+  ['Udaan',        'B2B',         '12x',  '#e11d48'],
+  ['Moglix',       'B2B',         '20x',  '#f59e0b'],
+  ['Lenskart',     'Eyewear',     '25x',  '#0ea5e9'],
+  ['MakeMyTrip',   'Travel',      '60x',  '#e60026'],
+  ['MPL',          'Gaming',      '15x',  '#6366f1'],
+  ['Spinny',       'Auto',        '18x',  '#3b82f6'],
+  ['Acko',         'Insurtech',   '20x',  '#7c3aed'],
+  ['OfBusiness',   'B2B',         '18x',  '#0d9488'],
+  ['Infra.Market', 'B2B',         '22x',  '#d97706'],
+  ['Fractal',      'Analytics',   '12x',  '#2563eb'],
+  ['Mensa Brands', 'D2C',         '8x',   '#db2777'],
+  ['GlobalBees',   'D2C',         '10x',  '#65a30d'],
+  ['Pristyn Care', 'Healthtech',  '12x',  '#06b6d4'],
+  ['PharmEasy',    'Healthtech',  '4x',   '#22c55e'],
+  ['NoBroker',     'Proptech',    '18x',  '#f43f5e'],
+  ['BlackBuck',    'Logistics',   '28x',  '#1e40af'],
+  ['Open Fin.',    'Fintech',     '15x',  '#7c3aed'],
+  ['XpressBees',   'Logistics',   '14x',  '#f97316'],
+  ['Zetwerk',      'Mfg',         '22x',  '#0891b2'],
+  ['LeadSquared',  'SaaS',        '15x',  '#4f46e5'],
+  ['Amagi',        'Media',       '35x',  '#dc2626'],
+  ['Rapido',       'Mobility',    '12x',  '#ca8a04'],
+  ['Stanza',       'Proptech',    '8x',   '#64748b'],
+  ['DealShare',    'E-commerce',  '10x',  '#10b981'],
+  ['Droom',        'Auto',        '8x',   '#818cf8'],
+  ['OneCard',      'Fintech',     '12x',  '#ef4444'],
 ]
 
-/* Multiple arcs per city — index into VC_CITIES */
-const ARC_SRCS = [0,0,1,1,2,2,3,4,4,5,5,6,6,6,7,7]
+const INDIA_R = 3.334
+const SMIN = INDIA_R - 0.10
+const SMAX = INDIA_R + 0.10
+const GROUP_DUR = 4000
+const FADE_DUR  = 500
 
-const INDIA_CENTER = { lat: 20.59, lng: 78.96 }
-const SMIN = 0.25, SMAX = 5.30
+function mColor(m: string): string {
+  const v = parseFloat(m)
+  if (isNaN(v)) return '#94a3b8'
+  if (v >= 100) return '#f0abfc'
+  if (v >= 20)  return '#4ade80'
+  if (v >= 10)  return '#86efac'
+  if (v >= 5)   return '#facc15'
+  return '#fb923c'
+}
+
+const GROUPS: [string, string, string, string][][] = []
+for (let g = 0; g < UNICORNS.length; g += 4) {
+  GROUPS.push(UNICORNS.slice(g, Math.min(g + 4, UNICORNS.length)))
+}
 
 export default function GlobeVisual() {
   const mountRef = useRef<HTMLDivElement>(null)
@@ -51,69 +95,74 @@ export default function GlobeVisual() {
   useEffect(() => {
     const container = mountRef.current
     if (!container) return
-
     let animId = 0
 
-    import('three').then(THREE => {
-      let W = container.clientWidth  || 500
-      let H = container.clientHeight || 500
+    // WebGL canvas
+    const cv = document.createElement('canvas')
+    Object.assign(cv.style, { position: 'absolute', top: '0', left: '0', display: 'block' })
+    container.appendChild(cv)
 
-      /* Renderer */
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    // 2D overlay canvas
+    const ol = document.createElement('canvas')
+    Object.assign(ol.style, {
+      position: 'absolute', top: '0', left: '0',
+      width: '100%', height: '100%',
+      display: 'block', pointerEvents: 'none',
+    })
+    container.appendChild(ol)
+
+    const ctx2 = ol.getContext('2d')!
+    let W = container.clientWidth  || 500
+    let H = container.clientHeight || 500
+    ol.width = W; ol.height = H
+
+    import('three').then(THREE => {
+      const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true })
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       renderer.setSize(W, H)
       renderer.setClearColor(0x000000, 0)
-      Object.assign(renderer.domElement.style, {
-        position: 'absolute', top: '0', left: '0', display: 'block',
-      })
-      container.appendChild(renderer.domElement)
 
-      /* Scene / Camera */
       const scene  = new THREE.Scene()
       const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000)
       camera.position.set(0, 0, 2.6)
       camera.lookAt(0, 0.36, 0)
       let targetZ = 2.6
 
-      /* Stars */
-      const sp = new Float32Array(5000 * 3)
+      // Stars
+      const sp = new Float32Array(4000 * 3)
       for (let i = 0; i < sp.length; i++) sp[i] = (Math.random() - 0.5) * 200
       const sg = new THREE.BufferGeometry()
       sg.setAttribute('position', new THREE.BufferAttribute(sp, 3))
       scene.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.11 })))
 
-      /* Globe group — all geo objects rotate together */
       const gg = new THREE.Group()
       scene.add(gg)
 
-      /* Earth sphere with real textures */
-      const ldr  = new THREE.TextureLoader()
-      const eMat = new THREE.MeshPhongMaterial({
-        map:         ldr.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
-        bumpMap:     ldr.load('https://unpkg.com/three-globe/example/img/earth-topology.png'),
-        bumpScale:   0.04,
-        specularMap: ldr.load('https://unpkg.com/three-globe/example/img/earth-water.png'),
-        specular:    new THREE.Color(0x1a2244),
-        shininess:   22,
-      })
-      gg.add(new THREE.Mesh(new THREE.SphereGeometry(1, 64, 64), eMat))
-
-      /* Thin atmosphere tint */
+      const ldr = new THREE.TextureLoader()
+      gg.add(new THREE.Mesh(
+        new THREE.SphereGeometry(1, 64, 64),
+        new THREE.MeshPhongMaterial({
+          map:         ldr.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
+          bumpMap:     ldr.load('https://unpkg.com/three-globe/example/img/earth-topology.png'),
+          bumpScale:   0.04,
+          specularMap: ldr.load('https://unpkg.com/three-globe/example/img/earth-water.png'),
+          specular:    new THREE.Color(0x1a2244),
+          shininess:   22,
+        }),
+      ))
       gg.add(new THREE.Mesh(
         new THREE.SphereGeometry(1.028, 32, 32),
-        new THREE.MeshPhongMaterial({ color: 0x3366ff, transparent: true, opacity: 0.07 }),
+        new THREE.MeshPhongMaterial({ color: 0x3366ff, transparent: true, opacity: 0.06, side: THREE.FrontSide }),
       ))
 
-      /* Lights */
       scene.add(new THREE.AmbientLight(0x334455, 0.9))
       const sun = new THREE.DirectionalLight(0xffeedd, 1.3)
       sun.position.set(5, 3, 5)
       scene.add(sun)
 
-      /* lat/lng → Vector3 helper */
       function ll(lat: number, lng: number, r = 1.013) {
-        const phi   = (90 - lat) * (Math.PI / 180)
-        const theta = (lng + 180) * (Math.PI / 180)
+        const phi   = (90 - lat) * Math.PI / 180
+        const theta = (lng + 180) * Math.PI / 180
         return new THREE.Vector3(
           -r * Math.sin(phi) * Math.cos(theta),
            r * Math.cos(phi),
@@ -121,179 +170,35 @@ export default function GlobeVisual() {
         )
       }
 
-      /* India tricolour overlay painted onto a canvas texture */
-      ;(function buildIndiaMesh() {
-        const OW = 2048, OH = 1024
-        const oc  = document.createElement('canvas')
-        oc.width = OW; oc.height = OH
-        const ctx = oc.getContext('2d')!
-        const xy  = (lat: number, lng: number): [number, number] =>
-          [(lng + 180) / 360 * OW, (90 - lat) / 180 * OH]
-
-        ctx.beginPath()
-        IND_COORDS.forEach(([lat, lng], i) => {
-          const [x, y] = xy(lat, lng)
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
-        })
-        ctx.closePath()
-        ctx.save()
-        ctx.clip()
-
-        const y1 = xy(27.33, 0)[1]
-        const y2 = xy(17.67, 0)[1]
-        ctx.fillStyle = '#FF9933'; ctx.fillRect(0,  0,  OW, y1)
-        ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,  y1, OW, y2 - y1)
-        ctx.fillStyle = '#138808'; ctx.fillRect(0,  y2, OW, OH - y2)
-        ctx.restore()
-
-        const tex = new THREE.CanvasTexture(oc)
-        tex.needsUpdate = true
-        const mesh = new THREE.Mesh(
-          new THREE.SphereGeometry(1.005, 64, 64),
-          new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.1 }),
-        )
-        mesh.renderOrder = 1
-        gg.add(mesh)
-      }())
-
-      /* India hub dot + 3 glow rings */
-      const INDP = ll(INDIA_CENTER.lat, INDIA_CENTER.lng, 1.013)
+      const INDP = ll(20.59, 78.96)
       const idot = new THREE.Mesh(
-        new THREE.SphereGeometry(0.022, 12, 12),
+        new THREE.SphereGeometry(0.010, 10, 10),
         new THREE.MeshBasicMaterial({ color: 0xff9922 }),
       )
       idot.position.copy(INDP)
-      idot.userData = { name: 'India' }
       gg.add(idot)
 
-      ;([
-        [0.030, 0.038, 0.55],
-        [0.044, 0.053, 0.30],
-        [0.062, 0.072, 0.14],
-      ] as [number, number, number][]).forEach(([r0, r1, op]) => {
-        const ring = new THREE.Mesh(
-          new THREE.RingGeometry(r0, r1, 28),
-          new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: op, side: THREE.DoubleSide }),
-        )
-        ring.position.copy(INDP)
-        ring.lookAt(INDP.clone().multiplyScalar(2))
-        gg.add(ring)
-      })
-
-      /* "INDIA" floating label */
-      const ilbl = document.createElement('div')
-      ilbl.textContent = 'INDIA'
-      Object.assign(ilbl.style, {
-        position: 'absolute', pointerEvents: 'none',
-        fontSize: '14px', fontWeight: '700',
-        whiteSpace: 'nowrap', letterSpacing: '.1em',
-        textShadow: '0 0 12px #000, 0 1px 5px #000',
-        color: '#ffaa33', opacity: '0',
-        fontFamily: 'system-ui, sans-serif',
-      })
-      container.appendChild(ilbl)
-
-      /* US city dots + labels */
-      type LabelItem = { el: HTMLDivElement; pos: ReturnType<typeof ll>; name: string }
-      type TMesh = InstanceType<typeof THREE.Mesh>
-      const cityMeshes: TMesh[] = [idot as TMesh]
-      const vcLabels: LabelItem[]   = []
-
-      VC_CITIES.forEach(c => {
-        const pos = ll(c.lat, c.lng, 1.013)
-
-        const dot = new THREE.Mesh(
-          new THREE.SphereGeometry(0.014, 10, 10),
-          new THREE.MeshBasicMaterial({ color: 0x55ddff }),
-        )
-        dot.position.copy(pos)
-        dot.userData = { name: c.name }
-        gg.add(dot)
-        cityMeshes.push(dot)
-
-        const ring = new THREE.Mesh(
-          new THREE.RingGeometry(0.020, 0.027, 20),
-          new THREE.MeshBasicMaterial({ color: 0xaaeeff, transparent: true, opacity: 0.35, side: THREE.DoubleSide }),
-        )
-        ring.position.copy(pos)
-        ring.lookAt(pos.clone().multiplyScalar(2))
-        gg.add(ring)
-
-        const el = document.createElement('div')
-        el.textContent = c.name
-        Object.assign(el.style, {
-          position: 'absolute', pointerEvents: 'none',
-          fontSize: '11px', fontWeight: '500',
-          whiteSpace: 'nowrap', paddingLeft: '9px',
-          textShadow: '0 0 8px #000, 0 1px 4px #000',
-          color: '#7dd8ff', opacity: '0',
-          fontFamily: 'system-ui, sans-serif',
-        })
-        container.appendChild(el)
-        vcLabels.push({ el, pos, name: c.name })
-      })
-
-      /* Animated arcs: US cities → India */
-      type ArcObj = {
-        geo: InstanceType<typeof THREE.BufferGeometry>
-        mat: InstanceType<typeof THREE.LineBasicMaterial>
-        totalPts: number
-        progress: number
-        speed: number
-      }
-      const arcObjs: ArcObj[] = ARC_SRCS.map((vi, idx) => {
-        const city = VC_CITIES[vi]
-        const s    = ll(city.lat, city.lng, 1.01)
-        const e    = ll(INDIA_CENTER.lat, INDIA_CENTER.lng, 1.01)
-        const jitter = (idx % 3) * 0.04 - 0.04
-        const mid  = s.clone().add(e).multiplyScalar(0.5).normalize().multiplyScalar(2.0 + jitter)
-        const curve = new THREE.QuadraticBezierCurve3(s, mid, e)
-        const PTS   = 100
-        const geo   = new THREE.BufferGeometry().setFromPoints(curve.getPoints(PTS))
-        geo.setDrawRange(0, 0)
-        const mat = new THREE.LineBasicMaterial({
-          color: 0xffee44, transparent: true, opacity: 0.88, depthTest: false,
-        })
-        gg.add(new THREE.Line(geo, mat))
-        return { geo, mat, totalPts: PTS + 1, progress: idx / ARC_SRCS.length, speed: 0.18 + Math.random() * 0.14 }
-      })
-
-      /* Swing rotation state — starts with India centred */
+      // India centred — tiny wobble
       let sDir = 1
-      gg.rotation.y = Math.PI
+      gg.rotation.y = INDIA_R
 
-      /* Interaction */
+      // Interaction
       let drag = false
-      let pMx = 0, pMy = 0, velX = 0, velY = 0
+      const pM = { x: 0, y: 0 }
+      const vel = { x: 0, y: 0 }
       let pTouch: { x: number; y: number } | null = null
 
       const onMouseDown = (e: MouseEvent) => {
-        drag = true; pMx = e.clientX; pMy = e.clientY; velX = 0; velY = 0
+        drag = true; pM.x = e.clientX; pM.y = e.clientY; vel.x = 0; vel.y = 0
         container.style.cursor = 'grabbing'
       }
       const onMouseMove = (e: MouseEvent) => {
-        const r = container.getBoundingClientRect()
-        if (drag) {
-          const dx = e.clientX - pMx, dy = e.clientY - pMy
-          gg.rotation.y += dx * 0.006
-          gg.rotation.x  = Math.max(-1.3, Math.min(1.3, gg.rotation.x + dy * 0.006))
-          velX = dy * 0.0008; velY = dx * 0.0008
-          pMx = e.clientX; pMy = e.clientY
-        } else {
-          /* Tooltip raycasting */
-          m2.x = ((e.clientX - r.left) / W) * 2 - 1
-          m2.y = -((e.clientY - r.top)  / H) * 2 + 1
-          ray.setFromCamera(m2, camera)
-          const hits = ray.intersectObjects(cityMeshes)
-          if (hits.length) {
-            tipEl.style.display = 'block'
-            tipEl.style.left = (e.clientX - r.left + 14) + 'px'
-            tipEl.style.top  = (e.clientY - r.top  -  8) + 'px'
-            tipEl.textContent = hits[0].object.userData.name as string
-          } else {
-            tipEl.style.display = 'none'
-          }
-        }
+        if (!drag) return
+        const dx = e.clientX - pM.x, dy = e.clientY - pM.y
+        gg.rotation.y += dx * 0.004
+        gg.rotation.x = Math.max(-0.5, Math.min(0.5, gg.rotation.x + dy * 0.004))
+        vel.x = dy * 0.0004; vel.y = dx * 0.0004
+        pM.x = e.clientX; pM.y = e.clientY
       }
       const onMouseUp = () => {
         drag = false; container.style.cursor = 'grab'
@@ -302,20 +207,20 @@ export default function GlobeVisual() {
       }
       const onWheel = (e: WheelEvent) => {
         e.preventDefault()
-        targetZ = Math.max(1.5, Math.min(5.5, targetZ + e.deltaY * 0.005))
+        targetZ = Math.max(1.8, Math.min(4.0, targetZ + e.deltaY * 0.004))
       }
       const onTouchStart = (e: TouchEvent) => {
         pTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }
-        velX = 0; velY = 0
+        vel.x = 0; vel.y = 0
       }
       const onTouchMove = (e: TouchEvent) => {
         if (!pTouch) return
         e.preventDefault()
         const dx = e.touches[0].clientX - pTouch.x
         const dy = e.touches[0].clientY - pTouch.y
-        gg.rotation.y += dx * 0.006
-        gg.rotation.x  = Math.max(-1.3, Math.min(1.3, gg.rotation.x + dy * 0.006))
-        velX = dy * 0.0008; velY = dx * 0.0008
+        gg.rotation.y += dx * 0.004
+        gg.rotation.x = Math.max(-0.5, Math.min(0.5, gg.rotation.x + dy * 0.004))
+        vel.x = dy * 0.0004; vel.y = dx * 0.0004
         pTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }
       }
       const onTouchEnd = () => { pTouch = null }
@@ -328,112 +233,157 @@ export default function GlobeVisual() {
       container.addEventListener('touchmove', onTouchMove, { passive: false })
       container.addEventListener('touchend', onTouchEnd)
 
-      /* Tooltip element */
-      const tipEl = document.createElement('div')
-      Object.assign(tipEl.style, {
-        position: 'absolute', display: 'none',
-        background: 'rgba(0,0,0,.82)', color: '#fff',
-        padding: '4px 10px', borderRadius: '6px',
-        fontSize: '12px', pointerEvents: 'none',
-        whiteSpace: 'nowrap', border: '.5px solid rgba(255,255,255,.15)',
-        fontFamily: 'system-ui, sans-serif',
-      })
-      container.appendChild(tipEl)
+      const tStart = performance.now()
 
-      const ray = new THREE.Raycaster()
-      const m2  = new THREE.Vector2()
+      function draw2D() {
+        ctx2.clearRect(0, 0, W, H)
+        gg.updateMatrixWorld()
+        const camDir = camera.position.clone().normalize()
 
-      /* Resize observer */
+        const pts = IND.map(([lat, lng]) => {
+          const wp   = ll(lat, lng, 1.001).applyMatrix4(gg.matrixWorld)
+          const f    = wp.clone().normalize().dot(camDir)
+          const proj = wp.clone().project(camera)
+          return { x: ((proj.x + 1) / 2) * W, y: ((-proj.y + 1) / 2) * H, ok: f > 0 }
+        })
+        if (pts.filter(p => p.ok).length < 8) return
+
+        const iwp = INDP.clone().applyMatrix4(gg.matrixWorld)
+        const fac  = Math.max(0, Math.min(1, (iwp.clone().normalize().dot(camDir) - 0.05) / 0.28))
+        if (fac < 0.02) return
+
+        let mnX = 1e9, mxX = -1e9, mnY = 1e9, mxY = -1e9
+        pts.forEach(p => {
+          if (p.ok) {
+            mnX = Math.min(mnX, p.x); mxX = Math.max(mxX, p.x)
+            mnY = Math.min(mnY, p.y); mxY = Math.max(mxY, p.y)
+          }
+        })
+        const cx = (mnX + mxX) / 2, cy = (mnY + mxY) / 2
+        const indW = mxX - mnX, indH = mxY - mnY
+
+        // "INDIA" in tricolour letters
+        const titleSize = Math.max(13, Math.min(22, indH * 0.13))
+        ctx2.save()
+        ctx2.globalAlpha = fac
+        ctx2.font = `bold ${titleSize}px system-ui,sans-serif`
+        ctx2.textBaseline = 'alphabetic'
+        ctx2.shadowColor = '#000'; ctx2.shadowBlur = 8
+
+        const letters  = ['I','N','D','I','A']
+        const lColors  = ['#FF9933','#FFFFFF','#FF9933','#FFFFFF','#138808']
+        let totalW = 0
+        letters.forEach((l, li) => { ctx2.fillStyle = lColors[li]; totalW += ctx2.measureText(l).width + (li < 4 ? 1 : 0) })
+        let lx = cx - totalW / 2, ly = mnY - titleSize * 0.5
+        letters.forEach((l, li) => {
+          ctx2.fillStyle = lColors[li]
+          ctx2.fillText(l, lx, ly)
+          lx += ctx2.measureText(l).width + 1
+        })
+        ctx2.restore()
+
+        // Rotating unicorn group (4 per card)
+        const now2    = performance.now(), total2 = now2 - tStart
+        const gIdx    = Math.floor(total2 / GROUP_DUR) % GROUPS.length
+        const elapsed = total2 % GROUP_DUR
+        let alpha = elapsed < FADE_DUR
+          ? elapsed / FADE_DUR
+          : elapsed > GROUP_DUR - FADE_DUR
+            ? (GROUP_DUR - elapsed) / FADE_DUR
+            : 1.0
+        alpha = Math.max(0, Math.min(1, alpha)) * fac
+
+        const grp   = GROUPS[gIdx]
+        const logoR = Math.max(9, Math.min(14, indH * 0.054))
+        const rowH  = Math.max(26, Math.min(36, indH * 0.175))
+        const cardW = Math.min(175, indW * 0.90)
+        const blockH = grp.length * rowH + 10
+        const bx = cx - cardW / 2, by = cy - blockH / 2 + indH * 0.03
+
+        // Dark panel background
+        ctx2.save()
+        ctx2.globalAlpha = alpha * 0.75
+        ctx2.fillStyle = '#040c1e'
+        ctx2.fillRect(bx - 4, by - 4, cardW + 8, blockH + 8)
+        ctx2.restore()
+
+        grp.forEach((u, i) => {
+          const ry       = by + 5 + i * rowH
+          const nameSize = Math.max(8, Math.min(11, rowH * 0.33))
+          const tagSize  = Math.max(7, Math.min(9,  rowH * 0.26))
+          const multSize = Math.max(9, Math.min(13, rowH * 0.36))
+
+          ctx2.save()
+          ctx2.globalAlpha = alpha
+
+          // Coloured logo circle with initial
+          ctx2.beginPath()
+          ctx2.arc(bx + logoR + 2, ry + rowH / 2, logoR, 0, Math.PI * 2)
+          ctx2.fillStyle = u[3]; ctx2.fill()
+          ctx2.font = `bold ${Math.round(logoR * 1.1)}px system-ui,sans-serif`
+          ctx2.fillStyle = '#fff'; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'
+          ctx2.shadowBlur = 0
+          ctx2.fillText(u[0].charAt(0), bx + logoR + 2, ry + rowH / 2)
+
+          // Company name
+          const tx = bx + logoR * 2 + 10
+          ctx2.textAlign = 'left'; ctx2.textBaseline = 'alphabetic'
+          ctx2.font = `600 ${nameSize}px system-ui,sans-serif`
+          ctx2.fillStyle = '#FF9933'
+          ctx2.shadowColor = '#000'; ctx2.shadowBlur = 4
+          ctx2.fillText(u[0], tx, ry + rowH * 0.45)
+
+          // Industry label
+          ctx2.font = `${tagSize}px system-ui,sans-serif`
+          ctx2.fillStyle = 'rgba(255,255,255,0.45)'
+          ctx2.shadowBlur = 0
+          ctx2.fillText(u[1], tx, ry + rowH * 0.45 + tagSize + 2)
+
+          // Multiple (right, coloured)
+          ctx2.textAlign = 'right'
+          ctx2.font = `bold ${multSize}px system-ui,sans-serif`
+          ctx2.fillStyle = mColor(u[2])
+          ctx2.shadowColor = mColor(u[2]); ctx2.shadowBlur = 6
+          ctx2.fillText(u[2], bx + cardW - 2, ry + rowH / 2 + multSize / 2)
+
+          ctx2.restore()
+
+          if (i < grp.length - 1) {
+            ctx2.save()
+            ctx2.globalAlpha = alpha * 0.12
+            ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 0.5
+            ctx2.beginPath()
+            ctx2.moveTo(bx, ry + rowH); ctx2.lineTo(bx + cardW, ry + rowH)
+            ctx2.stroke()
+            ctx2.restore()
+          }
+        })
+      }
+
       const ro = new ResizeObserver(() => {
         W = container.clientWidth; H = container.clientHeight
+        ol.width = W; ol.height = H
         renderer.setSize(W, H)
         camera.aspect = W / H
         camera.updateProjectionMatrix()
       })
       ro.observe(container)
 
-      /* Animation loop */
-      let lt = performance.now()
       const animate = () => {
         animId = requestAnimationFrame(animate)
-        const now = performance.now()
-        const dt  = Math.min((now - lt) / 1000, 0.05)
-        lt = now
-
-        /* Globe auto-rotation with swing bounce */
         if (!drag && !pTouch) {
-          gg.rotation.y += 0.0025 * sDir + velY
-          gg.rotation.x  = Math.max(-1.3, Math.min(1.3, gg.rotation.x + velX))
-          velX *= 0.96; velY *= 0.96
-          if (gg.rotation.y >= SMAX) { gg.rotation.y = SMAX; sDir = -1; velY = 0 }
-          else if (gg.rotation.y <= SMIN) { gg.rotation.y = SMIN; sDir = 1; velY = 0 }
+          gg.rotation.y += 0.0010 * sDir + vel.y
+          gg.rotation.x = Math.max(-0.5, Math.min(0.5, gg.rotation.x + vel.x))
+          vel.x *= 0.95; vel.y *= 0.95
+          if (gg.rotation.y >= SMAX) { gg.rotation.y = SMAX; sDir = -1; vel.y = 0 }
+          else if (gg.rotation.y <= SMIN) { gg.rotation.y = SMIN; sDir = 1; vel.y = 0 }
         }
-
-        /* Arc animation */
-        arcObjs.forEach(a => {
-          a.progress += a.speed * dt
-          if (a.progress > 1) a.progress = 0
-          const WIN = 0.20, head = a.progress, tail = Math.max(0, head - WIN)
-          a.geo.setDrawRange(
-            Math.floor(tail * a.totalPts),
-            Math.max(0, Math.floor((head - tail) * a.totalPts)),
-          )
-          const fi = Math.min(1, head / 0.05)
-          const fo = head > 0.88 ? Math.max(0, (1 - head) / 0.12) : 1
-          a.mat.opacity = 0.90 * fi * fo
-        })
-
-        /* Smooth camera zoom */
         camera.position.z += (targetZ - camera.position.z) * 0.1
-
         renderer.render(scene, camera)
-
-        /* Floating labels — project 3D → 2D with anti-overlap */
-        gg.updateMatrixWorld()
-        const cd = camera.position.clone().normalize()
-        const placed: { x: number; y: number; w: number; h: number }[] = []
-
-        /* India label */
-        const wpI  = INDP.clone().applyMatrix4(gg.matrixWorld)
-        const facI = wpI.clone().normalize().dot(cd)
-        if (facI >= 0.12) {
-          const p  = wpI.clone().project(camera)
-          const sx = ((p.x + 1) / 2) * W
-          const sy = ((-p.y + 1) / 2) * H
-          ilbl.style.left    = sx + 'px'
-          ilbl.style.top     = (sy - 6) + 'px'
-          ilbl.style.opacity = Math.min(1, (facI - 0.12) / 0.15).toFixed(2)
-          placed.push({ x: sx, y: sy, w: 60, h: 18 })
-        } else {
-          ilbl.style.opacity = '0'
-        }
-
-        /* City labels with overlap suppression */
-        vcLabels.forEach(item => {
-          const wp  = item.pos.clone().applyMatrix4(gg.matrixWorld)
-          const fac = wp.clone().normalize().dot(cd)
-          if (fac < 0.10) { item.el.style.opacity = '0'; return }
-          const p  = wp.clone().project(camera)
-          const sx = ((p.x + 1) / 2) * W
-          const sy = ((-p.y + 1) / 2) * H
-          const op = Math.min(1, (fac - 0.10) / 0.18)
-          const lw = item.name.length * 7
-          const overlaps = placed.some(
-            q => Math.abs(sx - q.x) < (lw + q.w) / 2 + 10 && Math.abs(sy - q.y) < (14 + q.h) / 2 + 6,
-          )
-          if (!overlaps) {
-            item.el.style.left    = sx + 'px'
-            item.el.style.top     = (sy - 6) + 'px'
-            item.el.style.opacity = op.toFixed(2)
-            placed.push({ x: sx, y: sy, w: lw, h: 14 })
-          } else {
-            item.el.style.opacity = '0'
-          }
-        })
+        draw2D()
       }
       animate()
 
-      /* Cleanup stored on container */
       const cleanup = () => {
         cancelAnimationFrame(animId)
         ro.disconnect()
@@ -445,10 +395,8 @@ export default function GlobeVisual() {
         container.removeEventListener('touchmove', onTouchMove)
         container.removeEventListener('touchend', onTouchEnd)
         renderer.dispose()
-        if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement)
-        if (container.contains(ilbl)) container.removeChild(ilbl)
-        if (container.contains(tipEl)) container.removeChild(tipEl)
-        vcLabels.forEach(item => { if (container.contains(item.el)) container.removeChild(item.el) })
+        if (container.contains(cv)) container.removeChild(cv)
+        if (container.contains(ol)) container.removeChild(ol)
       }
       ;(container as HTMLDivElement & { _gc?: () => void })._gc = cleanup
     })
