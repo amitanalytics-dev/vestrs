@@ -26,15 +26,15 @@ const companies: [string, string, string, string, string, string][] = [
   ['Zomato',       'zomato.com',       '#e23744', 'Foodtech',    '200x',  '$20B'],
   ['Razorpay',     'razorpay.com',     '#2eb5c1', 'Fintech',     '150x',  '$7.5B'],
   ["BYJU'S",       'byjus.com',        '#0b3d91', 'Edtech',      '80x',   '$1B'],
-  ['Meesho',       'meesho.com',       '#9b5de5', 'E-commerce',  '80x',   '$3.9B'],
+  ['Meesho',       'meesho.com',       '#9b5de5', 'E-commerce',  '100x',  '$3.9B'],
   ['Nykaa',        'nykaa.com',        '#fc4f8c', 'Beauty',      '100x',  '$6B'],
   ['PolicyBazaar', 'policybazaar.com', '#ef4444', 'Insurtech',   '100x',  '$3B'],
   ['Dream11',      'dream11.com',      '#e63946', 'Gaming',      '50x',   '$8B'],
   ['MakeMyTrip',   'makemytrip.com',   '#e60026', 'Travel',      '60x',   '$3.5B'],
   ['Chargebee',    'chargebee.com',    '#f97316', 'SaaS',        '40x',   '$3.5B'],
-  ['PhonePe',      'phonepe.com',      '#7c3aed', 'Fintech',     '40x',   '$12B'],
+  ['PhonePe',      'phonepe.com',      '#7c3aed', 'Fintech',     '50x',   '$12B'],
   ['Amagi',        'amagi.tv',         '#dc2626', 'Media Tech',  '35x',   '$1.4B'],
-  ['Zepto',        'zepto.in',         '#a855f7', 'Q-Commerce',  '30x',   '$5B'],
+  ['Zepto',        'zepto.in',         '#a855f7', 'Q-Commerce',  '60x',   '$5B'],
   ['Paytm',        'paytm.com',        '#1a6fc4', 'Fintech',     '30x',   '$2B'],
   ['InMobi',       'inmobi.com',       '#ff5733', 'Adtech',      '30x',   '$12B'],
   ['ShareChat',    'sharechat.com',    '#f7a51e', 'Social',      '30x',   '$4B'],
@@ -44,8 +44,8 @@ const companies: [string, string, string, string, string, string][] = [
   ['Ola',          'olacabs.com',      '#555555', 'Mobility',    '25x',   '$7B'],
   ['Zetwerk',      'zetwerk.com',      '#0891b2', 'Mfg Tech',    '22x',   '$2.7B'],
   ['Infra.Market', 'infra.market',     '#d97706', 'B2B',         '22x',   '$2.5B'],
-  ['Swiggy',       'swiggy.com',       '#fc8019', 'Foodtech',    '20x',   '$11B'],
-  ['Groww',        'groww.in',         '#00b386', 'Fintech',     '20x',   '$3.2B'],
+  ['Swiggy',       'swiggy.com',       '#fc8019', 'Foodtech',    '30x',   '$11B'],
+  ['Groww',        'groww.in',         '#00b386', 'Fintech',     '50x',   '$3.2B'],
   ['Moglix',       'moglix.com',       '#f59e0b', 'B2B',         '20x',   '$2.6B'],
   ['Acko',         'acko.com',         '#7c3aed', 'Insurtech',   '20x',   '$1.7B'],
   ['Slice',        'sliceit.app',      '#f0522b', 'Fintech',     '20x',   '$2B'],
@@ -66,7 +66,7 @@ const companies: [string, string, string, string, string, string][] = [
   ['BharatPe',     'bharatpe.com',     '#e8192c', 'Fintech',     '10x',   '$2B'],
   ['GlobalBees',   'globalbees.com',   '#65a30d', 'D2C',         '10x',   '$1B'],
   ['DealShare',    'dealshare.in',     '#10b981', 'E-commerce',  '10x',   '$400M'],
-  ['CRED',         'cred.club',        '#6366f1', 'Fintech',     '8x',    '$6.4B'],
+  ['CRED',         'cred.club',        '#6366f1', 'Fintech',     '80x',   '$6.4B'],
   ['Mensa Brands', 'mensabrands.com',  '#db2777', 'D2C',         '8x',    '$1B'],
   ['Stanza',       'stanzaliving.com', '#64748b', 'Proptech',    '8x',    '$400M'],
   ['Droom',        'droom.in',         '#818cf8', 'Auto Tech',   '8x',    '$1B'],
@@ -127,66 +127,87 @@ export default function Proof() {
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {companies.map(([name, domain, color, industry, multiple, valuation], i) => (
-            <motion.div
-              key={name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
-              transition={{ duration: 0.4, delay: (i % 10) * 0.03 }}
-              whileHover={{ y: -4, scale: 1.02 }}
-              className="flex flex-col bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 hover:bg-white/[0.07] hover:border-white/[0.15] transition-all duration-300 cursor-default"
-            >
-              {/* Logo + name */}
-              <div className="flex items-center gap-2.5 mb-2.5">
-                <div
-                  className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center relative overflow-hidden"
-                  style={{ background: hex2rgba(color, 0.18) }}
-                >
-                  <span className="font-black text-xs absolute select-none" style={{ color }}>
-                    {name.charAt(0)}
-                  </span>
-                  <img
-                    src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
-                    alt={name}
-                    width={24}
-                    height={24}
-                    className="relative z-10 object-contain"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                  />
-                </div>
-                <span className="font-semibold text-xs text-white truncate leading-tight">{name}</span>
-              </div>
+        {/* 3-row window — scroll to reveal all 50 companies */}
+        <div className="relative">
+          {/* Top fade — masks rows that have scrolled past */}
+          <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-[#060D18] to-transparent z-10 pointer-events-none" />
+          {/* Bottom hint — shows more content below */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#060D18] via-[#060D18]/70 to-transparent z-10 pointer-events-none" />
 
-              {/* Industry */}
-              <div className="mb-3">
-                <span
-                  className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
-                  style={{ background: hex2rgba(color, 0.12), color }}
+          <div
+            className="overflow-y-auto [&::-webkit-scrollbar]:hidden"
+            style={{ maxHeight: '500px', scrollbarWidth: 'none' }}
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 pb-8">
+              {companies.map(([name, domain, color, industry, multiple, valuation], i) => (
+                <motion.div
+                  key={name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-30px' }}
+                  transition={{ duration: 0.4, delay: (i % 10) * 0.03 }}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  className="flex flex-col bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 hover:bg-white/[0.07] hover:border-white/[0.15] transition-all duration-300 cursor-default"
                 >
-                  {industry}
-                </span>
-              </div>
-
-              {/* Multiple + Valuation */}
-              <div className="mt-auto border-t border-white/[0.08] pt-3 flex items-end justify-between gap-1 min-w-0">
-                <div className="min-w-0">
-                  <div
-                    className="font-black text-lg leading-none"
-                    style={{ color: mColor(multiple) }}
-                  >
-                    {multiple}
+                  {/* Logo + name */}
+                  <div className="flex items-center gap-2.5 mb-2.5">
+                    <div
+                      className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center relative overflow-hidden"
+                      style={{ background: hex2rgba(color, 0.18) }}
+                    >
+                      <span className="font-black text-xs absolute select-none" style={{ color }}>
+                        {name.charAt(0)}
+                      </span>
+                      <img
+                        src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
+                        alt={name}
+                        width={24}
+                        height={24}
+                        className="relative z-10 object-contain"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                      />
+                    </div>
+                    <span className="font-semibold text-xs text-white truncate leading-tight">{name}</span>
                   </div>
-                  <div className="text-slate-600 text-[9px] mt-0.5 whitespace-nowrap">early return</div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="font-bold text-sm leading-none text-slate-300">{valuation}</div>
-                  <div className="text-slate-600 text-[9px] mt-0.5">valuation</div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+
+                  {/* Industry */}
+                  <div className="mb-3">
+                    <span
+                      className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
+                      style={{ background: hex2rgba(color, 0.12), color }}
+                    >
+                      {industry}
+                    </span>
+                  </div>
+
+                  {/* Multiple + Valuation */}
+                  <div className="mt-auto border-t border-white/[0.08] pt-3 flex items-end justify-between gap-1 min-w-0">
+                    <div className="min-w-0">
+                      <div
+                        className="font-black text-lg leading-none"
+                        style={{ color: mColor(multiple) }}
+                      >
+                        {multiple}
+                      </div>
+                      <div className="text-slate-600 text-[9px] mt-0.5 whitespace-nowrap">max investor return</div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-bold text-sm leading-none text-slate-300">{valuation}</div>
+                      <div className="text-slate-600 text-[9px] mt-0.5">valuation</div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Scroll hint */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 text-slate-500 text-xs pointer-events-none">
+            <svg className="w-3 h-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+            scroll to see all 50
+          </div>
         </div>
 
         <motion.p
