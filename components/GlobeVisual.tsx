@@ -1,78 +1,74 @@
 'use client'
 import { useEffect, useRef } from 'react'
 
-const IND: [number, number][] = [
-  [35.5,76.0],[34.5,77.5],[33.0,79.0],[31.5,80.0],[30.0,81.0],[28.5,81.5],
-  [27.5,83.5],[27.3,85.0],[27.5,87.0],[27.0,88.0],[26.5,89.0],
-  [25.0,91.0],[24.5,92.0],[23.5,93.5],[22.0,92.5],
-  [21.0,87.0],[19.5,85.5],[18.0,84.5],[17.0,83.0],[16.0,82.0],
-  [15.5,80.5],[13.5,80.5],[12.5,80.0],[10.5,79.0],
-  [8.5,77.5],[8.0,77.0],[8.5,76.5],
-  [10.5,76.0],[12.0,75.0],[14.5,74.0],[16.5,73.5],[18.0,72.8],
-  [20.0,72.5],[21.0,72.0],[22.0,68.8],[22.5,68.0],
-  [25.0,70.0],[27.5,70.8],[30.0,71.5],
-  [32.5,75.0],[34.5,74.0],[35.5,76.0],
+// [name, industry, investor, multiple, color, lat, lng]
+const UNICORNS: [string, string, string, string, string, number, number][] = [
+  ['Flipkart',    'E-commerce', 'Accel India',      '400x', '#1e88e5', 12.97, 77.59],
+  ['Paytm',       'Fintech',    'SAIF Partners',    '30x',  '#1a6fc4', 28.54, 77.39],
+  ['Ola',         'Mobility',   'Matrix India',     '25x',  '#888888', 12.97, 77.59],
+  ["BYJU'S",      'Edtech',     'Aarin Capital',    '80x',  '#0b3d91', 12.97, 77.59],
+  ['Dream11',     'Gaming',     'Kalaari Capital',  '50x',  '#e63946', 19.08, 72.88],
+  ['Swiggy',      'Foodtech',   'SAIF Partners',    '20x',  '#fc8019', 12.97, 77.59],
+  ['Zomato',      'Foodtech',   'Info Edge',        '200x', '#e23744', 28.46, 77.03],
+  ['Razorpay',    'Fintech',    'Y Combinator',     '150x', '#2eb5c1', 12.97, 77.59],
+  ['CRED',        'Fintech',    'Sequoia India',    '8x',   '#6366f1', 12.97, 77.59],
+  ['Meesho',      'E-commerce', 'Y Combinator',     '80x',  '#9b5de5', 12.97, 77.59],
+  ['Nykaa',       'Beauty',     'TVS Capital',      '100x', '#fc4f8c', 19.08, 72.88],
+  ['PolicyBazaar','Insurtech',  'Info Edge',        '100x', '#ef4444', 28.46, 77.03],
+  ['PhonePe',     'Fintech',    'Flipkart / SV',    '40x',  '#7c3aed', 12.97, 77.59],
+  ['Groww',       'Fintech',    'Sequoia India',    '20x',  '#00b386', 12.97, 77.59],
+  ['Zepto',       'Q-Commerce', 'Y Combinator',     '30x',  '#a855f7', 19.08, 72.88],
+  ['BharatPe',    'Fintech',    'Sequoia India',    '10x',  '#e8192c', 28.54, 77.39],
+  ['Unacademy',   'Edtech',     'Sequoia India',    '12x',  '#0880ae', 12.97, 77.59],
+  ['Vedantu',     'Edtech',     'Omidyar Network',  '15x',  '#4d5cde', 12.97, 77.59],
+  ['ShareChat',   'Social',     'India Quotient',   '30x',  '#f7a51e', 12.97, 77.59],
+  ['Slice',       'Fintech',    'Blume Ventures',   '20x',  '#f0522b', 12.97, 77.59],
+  ['Darwinbox',   'HR Tech',    'Endiya Partners',  '25x',  '#1d4ed8', 17.38, 78.49],
+  ['Chargebee',   'SaaS',       'Accel India',      '40x',  '#f97316', 13.08, 80.27],
+  ['Freshworks',  'SaaS',       'Accel India',      '500x', '#25c16f', 13.08, 80.27],
+  ['InMobi',      'Adtech',     'Sherpalo',         '30x',  '#ff5733', 12.97, 77.59],
+  ['Udaan',       'B2B',        'Lightspeed India', '12x',  '#e11d48', 12.97, 77.59],
+  ['Moglix',      'B2B',        'Accel India',      '20x',  '#f59e0b', 28.54, 77.39],
+  ['Lenskart',    'Eyewear',    'IDG Ventures',     '25x',  '#0ea5e9', 28.46, 77.03],
+  ['MakeMyTrip',  'Travel',     'SAIF Partners',    '60x',  '#e60026', 28.46, 77.03],
+  ['MPL',         'Gaming',     'RTP Global',       '15x',  '#6366f1', 12.97, 77.59],
+  ['Spinny',      'Auto',       'Accel India',      '18x',  '#3b82f6', 28.46, 77.03],
+  ['Acko',        'Insurtech',  'SAIF Partners',    '20x',  '#7c3aed', 19.08, 72.88],
+  ['OfBusiness',  'B2B',        'Matrix India',     '18x',  '#0d9488', 28.46, 77.03],
+  ['Infra.Market','B2B',        'Accel India',      '22x',  '#d97706', 19.08, 72.88],
+  ['Fractal',     'Analytics',  'Khazanah',         '12x',  '#2563eb', 19.08, 72.88],
+  ['Mensa Brands','D2C',        'Accel India',      '8x',   '#db2777', 17.38, 78.49],
+  ['GlobalBees',  'D2C',        'FirstCry',         '10x',  '#65a30d', 28.54, 77.39],
+  ['Pristyn Care','Healthtech', 'Sequoia India',    '12x',  '#06b6d4', 28.46, 77.03],
+  ['PharmEasy',   'Healthtech', 'Bessemer',         '4x',   '#22c55e', 19.08, 72.88],
+  ['NoBroker',    'Proptech',   'SAIF Partners',    '18x',  '#f43f5e', 12.97, 77.59],
+  ['BlackBuck',   'Logistics',  'Accel India',      '28x',  '#1e40af', 12.97, 77.59],
+  ['Open Fin.',   'Fintech',    'Beenext',          '15x',  '#8b5cf6', 17.38, 78.49],
+  ['XpressBees',  'Logistics',  'SAIF Partners',    '14x',  '#f97316', 18.52, 73.86],
+  ['Zetwerk',     'Mfg',        'Accel India',      '22x',  '#0891b2', 12.97, 77.59],
+  ['LeadSquared', 'SaaS',       'WestBridge',       '15x',  '#4f46e5', 12.97, 77.59],
+  ['Amagi',       'Media',      'Accel India',      '35x',  '#dc2626', 12.97, 77.59],
+  ['Rapido',      'Mobility',   'WestBridge',       '12x',  '#ca8a04', 12.97, 77.59],
+  ['Stanza',      'Proptech',   'Matrix India',     '8x',   '#64748b', 28.54, 77.39],
+  ['DealShare',   'E-commerce', 'Matrix India',     '10x',  '#10b981', 26.91, 75.79],
+  ['Droom',       'Auto',       'Lightbox',         '8x',   '#818cf8', 28.46, 77.03],
+  ['OneCard',     'Fintech',    'Matrix India',     '12x',  '#ef4444', 18.52, 73.86],
 ]
 
-// [name, industry, multiple, brandColor]
-const UNICORNS: [string, string, string, string][] = [
-  ['Flipkart',     'E-commerce',  '400x', '#1e88e5'],
-  ['Paytm',        'Fintech',     '30x',  '#1a6fc4'],
-  ['Ola',          'Mobility',    '25x',  '#555555'],
-  ["BYJU'S",       'Edtech',      '80x',  '#0b3d91'],
-  ['Dream11',      'Gaming',      '50x',  '#e63946'],
-  ['Swiggy',       'Foodtech',    '20x',  '#fc8019'],
-  ['Zomato',       'Foodtech',    '200x', '#e23744'],
-  ['Razorpay',     'Fintech',     '150x', '#2eb5c1'],
-  ['CRED',         'Fintech',     '8x',   '#6366f1'],
-  ['Meesho',       'E-commerce',  '80x',  '#9b5de5'],
-  ['Nykaa',        'Beauty',      '100x', '#fc4f8c'],
-  ['PolicyBazaar', 'Insurtech',   '100x', '#ef4444'],
-  ['PhonePe',      'Fintech',     '40x',  '#7c3aed'],
-  ['Groww',        'Fintech',     '20x',  '#00b386'],
-  ['Zepto',        'Q-Commerce',  '30x',  '#a855f7'],
-  ['BharatPe',     'Fintech',     '10x',  '#e8192c'],
-  ['Unacademy',    'Edtech',      '12x',  '#0880ae'],
-  ['Vedantu',      'Edtech',      '15x',  '#4d5cde'],
-  ['ShareChat',    'Social',      '30x',  '#f7a51e'],
-  ['Slice',        'Fintech',     '20x',  '#f0522b'],
-  ['Darwinbox',    'HR Tech',     '25x',  '#1d4ed8'],
-  ['Chargebee',    'SaaS',        '40x',  '#f97316'],
-  ['Freshworks',   'SaaS',        '500x', '#25c16f'],
-  ['InMobi',       'Adtech',      '30x',  '#ff5733'],
-  ['Udaan',        'B2B',         '12x',  '#e11d48'],
-  ['Moglix',       'B2B',         '20x',  '#f59e0b'],
-  ['Lenskart',     'Eyewear',     '25x',  '#0ea5e9'],
-  ['MakeMyTrip',   'Travel',      '60x',  '#e60026'],
-  ['MPL',          'Gaming',      '15x',  '#6366f1'],
-  ['Spinny',       'Auto',        '18x',  '#3b82f6'],
-  ['Acko',         'Insurtech',   '20x',  '#7c3aed'],
-  ['OfBusiness',   'B2B',         '18x',  '#0d9488'],
-  ['Infra.Market', 'B2B',         '22x',  '#d97706'],
-  ['Fractal',      'Analytics',   '12x',  '#2563eb'],
-  ['Mensa Brands', 'D2C',         '8x',   '#db2777'],
-  ['GlobalBees',   'D2C',         '10x',  '#65a30d'],
-  ['Pristyn Care', 'Healthtech',  '12x',  '#06b6d4'],
-  ['PharmEasy',    'Healthtech',  '4x',   '#22c55e'],
-  ['NoBroker',     'Proptech',    '18x',  '#f43f5e'],
-  ['BlackBuck',    'Logistics',   '28x',  '#1e40af'],
-  ['Open Fin.',    'Fintech',     '15x',  '#7c3aed'],
-  ['XpressBees',   'Logistics',   '14x',  '#f97316'],
-  ['Zetwerk',      'Mfg',         '22x',  '#0891b2'],
-  ['LeadSquared',  'SaaS',        '15x',  '#4f46e5'],
-  ['Amagi',        'Media',       '35x',  '#dc2626'],
-  ['Rapido',       'Mobility',    '12x',  '#ca8a04'],
-  ['Stanza',       'Proptech',    '8x',   '#64748b'],
-  ['DealShare',    'E-commerce',  '10x',  '#10b981'],
-  ['Droom',        'Auto',        '8x',   '#818cf8'],
-  ['OneCard',      'Fintech',     '12x',  '#ef4444'],
+const HQ_CITIES = [
+  { name: 'Bangalore', lat: 12.97, lng: 77.59 },
+  { name: 'Mumbai',    lat: 19.08, lng: 72.88 },
+  { name: 'Delhi NCR', lat: 28.54, lng: 77.39 },
+  { name: 'Hyderabad', lat: 17.38, lng: 78.49 },
+  { name: 'Pune',      lat: 18.52, lng: 73.86 },
+  { name: 'Chennai',   lat: 13.08, lng: 80.27 },
 ]
 
-const INDIA_R = 3.334
-const SMIN = INDIA_R - 0.10
-const SMAX = INDIA_R + 0.10
+const IR = 3.334
+const SMIN = IR - 0.08
+const SMAX = IR + 0.08
 const GROUP_DUR = 4000
-const FADE_DUR  = 500
+const FADE_DUR  = 600
 
 function mColor(m: string): string {
   const v = parseFloat(m)
@@ -84,9 +80,9 @@ function mColor(m: string): string {
   return '#fb923c'
 }
 
-const GROUPS: [string, string, string, string][][] = []
-for (let g = 0; g < UNICORNS.length; g += 4) {
-  GROUPS.push(UNICORNS.slice(g, Math.min(g + 4, UNICORNS.length)))
+const GROUPS: [string, string, string, string, string, number, number][][] = []
+for (let g = 0; g < UNICORNS.length; g += 2) {
+  GROUPS.push(UNICORNS.slice(g, Math.min(g + 2, UNICORNS.length)))
 }
 
 export default function GlobeVisual() {
@@ -97,12 +93,10 @@ export default function GlobeVisual() {
     if (!container) return
     let animId = 0
 
-    // WebGL canvas
     const cv = document.createElement('canvas')
     Object.assign(cv.style, { position: 'absolute', top: '0', left: '0', display: 'block' })
     container.appendChild(cv)
 
-    // 2D overlay canvas
     const ol = document.createElement('canvas')
     Object.assign(ol.style, {
       position: 'absolute', top: '0', left: '0',
@@ -124,12 +118,12 @@ export default function GlobeVisual() {
 
       const scene  = new THREE.Scene()
       const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000)
-      camera.position.set(0, 0, 2.6)
-      camera.lookAt(0, 0.36, 0)
-      let targetZ = 2.6
+      camera.position.set(0, 0, 2.05)
+      camera.lookAt(0, 0.58, 0)
+      let targetZ = 2.05
 
       // Stars
-      const sp = new Float32Array(4000 * 3)
+      const sp = new Float32Array(3000 * 3)
       for (let i = 0; i < sp.length; i++) sp[i] = (Math.random() - 0.5) * 200
       const sg = new THREE.BufferGeometry()
       sg.setAttribute('position', new THREE.BufferAttribute(sp, 3))
@@ -154,7 +148,6 @@ export default function GlobeVisual() {
         new THREE.SphereGeometry(1.028, 32, 32),
         new THREE.MeshPhongMaterial({ color: 0x3366ff, transparent: true, opacity: 0.06, side: THREE.FrontSide }),
       ))
-
       scene.add(new THREE.AmbientLight(0x334455, 0.9))
       const sun = new THREE.DirectionalLight(0xffeedd, 1.3)
       sun.position.set(5, 3, 5)
@@ -170,17 +163,21 @@ export default function GlobeVisual() {
         )
       }
 
-      const INDP = ll(20.59, 78.96)
-      const idot = new THREE.Mesh(
-        new THREE.SphereGeometry(0.010, 10, 10),
-        new THREE.MeshBasicMaterial({ color: 0xff9922 }),
-      )
-      idot.position.copy(INDP)
-      gg.add(idot)
+      // Persistent city dots on the 3D globe
+      HQ_CITIES.forEach(c => {
+        const pos = ll(c.lat, c.lng, 1.013)
+        const dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.008, 8, 8),
+          new THREE.MeshBasicMaterial({ color: 0xff9922 }),
+        )
+        dot.position.copy(pos)
+        gg.add(dot)
+      })
 
-      // India centred — tiny wobble
+      // India-centred with tiny wobble + tilt
       let sDir = 1
-      gg.rotation.y = INDIA_R
+      gg.rotation.y = IR
+      gg.rotation.x = 0.28
 
       // Interaction
       let drag = false
@@ -196,7 +193,7 @@ export default function GlobeVisual() {
         if (!drag) return
         const dx = e.clientX - pM.x, dy = e.clientY - pM.y
         gg.rotation.y += dx * 0.004
-        gg.rotation.x = Math.max(-0.5, Math.min(0.5, gg.rotation.x + dy * 0.004))
+        gg.rotation.x = Math.max(0.12, Math.min(0.45, gg.rotation.x + dy * 0.004))
         vel.x = dy * 0.0004; vel.y = dx * 0.0004
         pM.x = e.clientX; pM.y = e.clientY
       }
@@ -207,19 +204,17 @@ export default function GlobeVisual() {
       }
       const onWheel = (e: WheelEvent) => {
         e.preventDefault()
-        targetZ = Math.max(1.8, Math.min(4.0, targetZ + e.deltaY * 0.004))
+        targetZ = Math.max(1.6, Math.min(2.8, targetZ + e.deltaY * 0.003))
       }
       const onTouchStart = (e: TouchEvent) => {
         pTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }
         vel.x = 0; vel.y = 0
       }
       const onTouchMove = (e: TouchEvent) => {
-        if (!pTouch) return
-        e.preventDefault()
-        const dx = e.touches[0].clientX - pTouch.x
-        const dy = e.touches[0].clientY - pTouch.y
+        if (!pTouch) return; e.preventDefault()
+        const dx = e.touches[0].clientX - pTouch.x, dy = e.touches[0].clientY - pTouch.y
         gg.rotation.y += dx * 0.004
-        gg.rotation.x = Math.max(-0.5, Math.min(0.5, gg.rotation.x + dy * 0.004))
+        gg.rotation.x = Math.max(0.12, Math.min(0.45, gg.rotation.x + dy * 0.004))
         vel.x = dy * 0.0004; vel.y = dx * 0.0004
         pTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }
       }
@@ -235,129 +230,117 @@ export default function GlobeVisual() {
 
       const tStart = performance.now()
 
+      function drawPin(
+        u: [string, string, string, string, string, number, number],
+        compIdx: number,
+        alpha: number,
+        now: number,
+        camDir: ReturnType<typeof camera.position.clone>,
+      ) {
+        if (alpha < 0.01) return
+        const wp = ll(u[5], u[6], 1.002).applyMatrix4(gg.matrixWorld)
+        if (wp.clone().normalize().dot(camDir) < 0.15) return
+
+        const proj = wp.clone().project(camera)
+        const px = ((proj.x + 1) / 2) * W
+        const py = ((-proj.y + 1) / 2) * H
+
+        // Pulsing halo
+        const pulse = 0.5 + 0.5 * Math.sin(now * 0.005 + compIdx * 1.5)
+        ctx2.save()
+        ctx2.globalAlpha = alpha * 0.3
+        ctx2.beginPath(); ctx2.arc(px, py, 4 + pulse * 5, 0, Math.PI * 2)
+        ctx2.fillStyle = u[4]; ctx2.fill()
+        ctx2.restore()
+
+        // Solid dot
+        ctx2.save()
+        ctx2.globalAlpha = alpha
+        ctx2.beginPath(); ctx2.arc(px, py, 4, 0, Math.PI * 2)
+        ctx2.fillStyle = u[4]; ctx2.fill()
+        ctx2.strokeStyle = 'rgba(255,255,255,0.6)'; ctx2.lineWidth = 1; ctx2.stroke()
+        ctx2.restore()
+
+        const CW = 155, CH = 50
+        const offX = compIdx === 0 ? 14 : -(CW + 14)
+        const offY = compIdx === 0 ? -(CH * 0.7) : -(CH * 0.3)
+        let cx = px + offX, cy = py + offY
+
+        if (cx < 4)       cx = 4
+        if (cx + CW > W - 4) cx = W - CW - 4
+        if (cy < 4)       cy = 4
+        if (cy + CH > H - 4) cy = H - CH - 4
+
+        // Dashed connector
+        ctx2.save()
+        ctx2.globalAlpha = alpha * 0.55
+        ctx2.strokeStyle = '#FF9933'; ctx2.lineWidth = 1
+        ctx2.setLineDash([3, 3])
+        const lineAnchorX = compIdx === 0 ? cx : cx + CW
+        ctx2.beginPath(); ctx2.moveTo(px, py); ctx2.lineTo(lineAnchorX, cy + CH / 2); ctx2.stroke()
+        ctx2.restore()
+
+        // Card bg + accent bar
+        ctx2.save()
+        ctx2.globalAlpha = alpha * 0.88
+        ctx2.fillStyle = '#040c1e'
+        ctx2.fillRect(cx, cy, CW, CH)
+        ctx2.globalAlpha = alpha * 0.7
+        ctx2.fillStyle = u[4]
+        ctx2.fillRect(cx, cy, 3, CH)
+        ctx2.restore()
+
+        const lr = 13
+        ctx2.save()
+        ctx2.globalAlpha = alpha
+
+        // Logo circle
+        ctx2.beginPath(); ctx2.arc(cx + lr + 7, cy + CH / 2, lr, 0, Math.PI * 2)
+        ctx2.fillStyle = u[4]; ctx2.fill()
+        ctx2.font = 'bold 11px system-ui,sans-serif'
+        ctx2.fillStyle = '#fff'; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'
+        ctx2.shadowBlur = 0
+        ctx2.fillText(u[0].charAt(0), cx + lr + 7, cy + CH / 2)
+
+        // Company name
+        const tx = cx + lr * 2 + 14
+        ctx2.font = '600 10.5px system-ui,sans-serif'
+        ctx2.fillStyle = '#FF9933'; ctx2.textAlign = 'left'; ctx2.textBaseline = 'alphabetic'
+        ctx2.shadowColor = '#000'; ctx2.shadowBlur = 3
+        ctx2.fillText(u[0], tx, cy + 19)
+
+        // Industry
+        ctx2.font = '8.5px system-ui,sans-serif'
+        ctx2.fillStyle = 'rgba(255,255,255,0.42)'; ctx2.shadowBlur = 0
+        ctx2.fillText(u[1], tx, cy + 31)
+
+        // Multiple (right, glowing)
+        ctx2.font = 'bold 13px system-ui,sans-serif'
+        ctx2.fillStyle = mColor(u[3])
+        ctx2.shadowColor = mColor(u[3]); ctx2.shadowBlur = 8
+        ctx2.textAlign = 'right'
+        ctx2.fillText(u[3], cx + CW - 5, cy + 34)
+
+        ctx2.restore()
+      }
+
       function draw2D() {
         ctx2.clearRect(0, 0, W, H)
         gg.updateMatrixWorld()
         const camDir = camera.position.clone().normalize()
 
-        const pts = IND.map(([lat, lng]) => {
-          const wp   = ll(lat, lng, 1.001).applyMatrix4(gg.matrixWorld)
-          const f    = wp.clone().normalize().dot(camDir)
-          const proj = wp.clone().project(camera)
-          return { x: ((proj.x + 1) / 2) * W, y: ((-proj.y + 1) / 2) * H, ok: f > 0 }
-        })
-        if (pts.filter(p => p.ok).length < 8) return
-
-        const iwp = INDP.clone().applyMatrix4(gg.matrixWorld)
-        const fac  = Math.max(0, Math.min(1, (iwp.clone().normalize().dot(camDir) - 0.05) / 0.28))
-        if (fac < 0.02) return
-
-        let mnX = 1e9, mxX = -1e9, mnY = 1e9, mxY = -1e9
-        pts.forEach(p => {
-          if (p.ok) {
-            mnX = Math.min(mnX, p.x); mxX = Math.max(mxX, p.x)
-            mnY = Math.min(mnY, p.y); mxY = Math.max(mxY, p.y)
-          }
-        })
-        const cx = (mnX + mxX) / 2, cy = (mnY + mxY) / 2
-        const indW = mxX - mnX, indH = mxY - mnY
-
-        // "INDIA" in tricolour letters
-        const titleSize = Math.max(13, Math.min(22, indH * 0.13))
-        ctx2.save()
-        ctx2.globalAlpha = fac
-        ctx2.font = `bold ${titleSize}px system-ui,sans-serif`
-        ctx2.textBaseline = 'alphabetic'
-        ctx2.shadowColor = '#000'; ctx2.shadowBlur = 8
-
-        const letters  = ['I','N','D','I','A']
-        const lColors  = ['#FF9933','#FFFFFF','#FF9933','#FFFFFF','#138808']
-        let totalW = 0
-        letters.forEach((l, li) => { ctx2.fillStyle = lColors[li]; totalW += ctx2.measureText(l).width + (li < 4 ? 1 : 0) })
-        let lx = cx - totalW / 2, ly = mnY - titleSize * 0.5
-        letters.forEach((l, li) => {
-          ctx2.fillStyle = lColors[li]
-          ctx2.fillText(l, lx, ly)
-          lx += ctx2.measureText(l).width + 1
-        })
-        ctx2.restore()
-
-        // Rotating unicorn group (4 per card)
-        const now2    = performance.now(), total2 = now2 - tStart
-        const gIdx    = Math.floor(total2 / GROUP_DUR) % GROUPS.length
+        const now2   = performance.now()
+        const total2 = now2 - tStart
+        const gIdx   = Math.floor(total2 / GROUP_DUR) % GROUPS.length
         const elapsed = total2 % GROUP_DUR
         let alpha = elapsed < FADE_DUR
           ? elapsed / FADE_DUR
           : elapsed > GROUP_DUR - FADE_DUR
             ? (GROUP_DUR - elapsed) / FADE_DUR
             : 1.0
-        alpha = Math.max(0, Math.min(1, alpha)) * fac
+        alpha = Math.max(0, Math.min(1, alpha))
 
-        const grp   = GROUPS[gIdx]
-        const logoR = Math.max(9, Math.min(14, indH * 0.054))
-        const rowH  = Math.max(26, Math.min(36, indH * 0.175))
-        const cardW = Math.min(175, indW * 0.90)
-        const blockH = grp.length * rowH + 10
-        const bx = cx - cardW / 2, by = cy - blockH / 2 + indH * 0.03
-
-        // Dark panel background
-        ctx2.save()
-        ctx2.globalAlpha = alpha * 0.75
-        ctx2.fillStyle = '#040c1e'
-        ctx2.fillRect(bx - 4, by - 4, cardW + 8, blockH + 8)
-        ctx2.restore()
-
-        grp.forEach((u, i) => {
-          const ry       = by + 5 + i * rowH
-          const nameSize = Math.max(8, Math.min(11, rowH * 0.33))
-          const tagSize  = Math.max(7, Math.min(9,  rowH * 0.26))
-          const multSize = Math.max(9, Math.min(13, rowH * 0.36))
-
-          ctx2.save()
-          ctx2.globalAlpha = alpha
-
-          // Coloured logo circle with initial
-          ctx2.beginPath()
-          ctx2.arc(bx + logoR + 2, ry + rowH / 2, logoR, 0, Math.PI * 2)
-          ctx2.fillStyle = u[3]; ctx2.fill()
-          ctx2.font = `bold ${Math.round(logoR * 1.1)}px system-ui,sans-serif`
-          ctx2.fillStyle = '#fff'; ctx2.textAlign = 'center'; ctx2.textBaseline = 'middle'
-          ctx2.shadowBlur = 0
-          ctx2.fillText(u[0].charAt(0), bx + logoR + 2, ry + rowH / 2)
-
-          // Company name
-          const tx = bx + logoR * 2 + 10
-          ctx2.textAlign = 'left'; ctx2.textBaseline = 'alphabetic'
-          ctx2.font = `600 ${nameSize}px system-ui,sans-serif`
-          ctx2.fillStyle = '#FF9933'
-          ctx2.shadowColor = '#000'; ctx2.shadowBlur = 4
-          ctx2.fillText(u[0], tx, ry + rowH * 0.45)
-
-          // Industry label
-          ctx2.font = `${tagSize}px system-ui,sans-serif`
-          ctx2.fillStyle = 'rgba(255,255,255,0.45)'
-          ctx2.shadowBlur = 0
-          ctx2.fillText(u[1], tx, ry + rowH * 0.45 + tagSize + 2)
-
-          // Multiple (right, coloured)
-          ctx2.textAlign = 'right'
-          ctx2.font = `bold ${multSize}px system-ui,sans-serif`
-          ctx2.fillStyle = mColor(u[2])
-          ctx2.shadowColor = mColor(u[2]); ctx2.shadowBlur = 6
-          ctx2.fillText(u[2], bx + cardW - 2, ry + rowH / 2 + multSize / 2)
-
-          ctx2.restore()
-
-          if (i < grp.length - 1) {
-            ctx2.save()
-            ctx2.globalAlpha = alpha * 0.12
-            ctx2.strokeStyle = '#fff'; ctx2.lineWidth = 0.5
-            ctx2.beginPath()
-            ctx2.moveTo(bx, ry + rowH); ctx2.lineTo(bx + cardW, ry + rowH)
-            ctx2.stroke()
-            ctx2.restore()
-          }
-        })
+        GROUPS[gIdx].forEach((u, i) => drawPin(u, i, alpha, now2, camDir))
       }
 
       const ro = new ResizeObserver(() => {
@@ -372,8 +355,8 @@ export default function GlobeVisual() {
       const animate = () => {
         animId = requestAnimationFrame(animate)
         if (!drag && !pTouch) {
-          gg.rotation.y += 0.0010 * sDir + vel.y
-          gg.rotation.x = Math.max(-0.5, Math.min(0.5, gg.rotation.x + vel.x))
+          gg.rotation.y += 0.0008 * sDir + vel.y
+          gg.rotation.x = Math.max(0.12, Math.min(0.45, gg.rotation.x + vel.x))
           vel.x *= 0.95; vel.y *= 0.95
           if (gg.rotation.y >= SMAX) { gg.rotation.y = SMAX; sDir = -1; vel.y = 0 }
           else if (gg.rotation.y <= SMIN) { gg.rotation.y = SMIN; sDir = 1; vel.y = 0 }

@@ -71,16 +71,24 @@ body {
   .guided-word { transition: none !important; }
 }
 
-/* ─── Ticker marquee ─────────────────────────────────────── */
+/* ─── Ticker marquees ────────────────────────────────────── */
 @keyframes tickerScroll {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
-.ticker-track {
-  animation: tickerScroll 65s linear infinite;
+.ticker-track,
+.ticker-top {
+  animation: tickerScroll 52s linear infinite;
+}
+.ticker-track:hover,
+.ticker-top:hover {
+  animation-play-state: paused;
 }
 
-.ticker-track:hover {
+.ticker-bottom {
+  animation: tickerScroll 75s linear infinite;
+}
+.ticker-bottom:hover {
   animation-play-state: paused;
 }

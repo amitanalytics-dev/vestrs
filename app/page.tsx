@@ -16,8 +16,8 @@ export default function Home() {
   return (
     <main>
       <Nav />
-      <Hero />
       <Ticker />
+      <Hero />
       <WhyIndia />
       <Proof />
       <TheGap />

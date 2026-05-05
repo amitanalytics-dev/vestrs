@@ -54,7 +54,7 @@ export default function Hero() {
       {/* Left fade */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#07101D] via-[#07101D]/85 md:via-[#07101D]/60 to-transparent pointer-events-none z-10" />
 
-      <div className="relative z-20 max-w-7xl mx-auto px-6 pt-28 pb-20 w-full">
+      <div className="relative z-20 max-w-7xl mx-auto px-6 pt-[148px] pb-20 w-full">
         <div className="max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
