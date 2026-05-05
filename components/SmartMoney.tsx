@@ -27,6 +27,30 @@ const quotes = [
     textAccent: 'text-violet-400',
     bg: 'bg-violet-950/30',
   },
+  {
+    quote: "I have made my biggest bets on India. 1.4 billion people, 650 million smartphone users, the fastest-growing internet economy on earth. When history looks back at this decade, India will be seen as the defining investment story of our era.",
+    author: "SoftBank Group",
+    role: "$10B+ deployed in India · Ola, Paytm, Meesho, Delhivery backed",
+    accentColor: 'border-amber-500/40',
+    textAccent: 'text-amber-400',
+    bg: 'bg-amber-950/30',
+  },
+  {
+    quote: "The calibre of founders coming from India has surpassed our expectations every year. They are solving hard, consequential problems with global ambition. We have tripled our India cohort intake because the quality demands it.",
+    author: "Y Combinator",
+    role: "150+ Indian-founded companies backed · Razorpay, Groww, Meesho alumni",
+    accentColor: 'border-rose-500/40',
+    textAccent: 'text-rose-400',
+    bg: 'bg-rose-950/30',
+  },
+  {
+    quote: "India is not just a domestic opportunity — Indian founders are building category-defining companies that will compete globally. We are at an inflection point. The next decade in India will generate more venture wealth than the prior thirty.",
+    author: "Accel India",
+    role: "Flipkart, Freshworks early backer · $2.8B India AUM",
+    accentColor: 'border-cyan-500/40',
+    textAccent: 'text-cyan-400',
+    bg: 'bg-cyan-950/30',
+  },
 ]
 
 const reports = [
