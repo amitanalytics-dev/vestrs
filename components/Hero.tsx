@@ -47,7 +47,7 @@ export default function Hero() {
       }} />
 
       {/* Globe */}
-      <div className="absolute right-[-5%] md:right-[-2%] top-1/2 -translate-y-1/2 w-[90vw] md:w-[55vw] lg:w-[52vw] h-[90vw] md:h-[55vw] lg:h-[52vw] max-w-[700px] max-h-[700px] opacity-50 md:opacity-90">
+      <div className="absolute right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 w-[85vw] md:w-[52vw] lg:w-[50vw] h-[85vw] md:h-[52vw] lg:h-[50vw] max-w-[680px] max-h-[680px] opacity-50 md:opacity-90">
         <GlobeVisual />
       </div>
 

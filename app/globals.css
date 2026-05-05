@@ -70,3 +70,17 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .guided-word { transition: none !important; }
 }
+
+/* ─── Ticker marquee ─────────────────────────────────────── */
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  animation: tickerScroll 65s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}

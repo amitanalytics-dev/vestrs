@@ -1,5 +1,6 @@
 import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
+import Ticker from '@/components/Ticker'
 import WhyIndia from '@/components/WhyIndia'
 import Proof from '@/components/Proof'
 import TheGap from '@/components/TheGap'
@@ -16,6 +17,7 @@ export default function Home() {
     <main>
       <Nav />
       <Hero />
+      <Ticker />
       <WhyIndia />
       <Proof />
       <TheGap />
