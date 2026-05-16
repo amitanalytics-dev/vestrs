@@ -11,9 +11,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name and email are required.' }, { status: 400 })
     }
 
-    await resend.emails.send({
+    const notifyTo = process.env.NOTIFY_EMAIL ?? 'ir@vestrs.com'
+
+    const result = await resend.emails.send({
       from: 'Vestrs Waitlist <onboarding@resend.dev>',
-      to: ['ir@vestrs.com'],
+      to: [notifyTo],
       subject: `New waitlist signup — ${name}`,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;">
@@ -36,9 +38,20 @@ export async function POST(req: NextRequest) {
       `,
     })
 
+    // Resend returns { data, error } — surface the error if present
+    if (result.error) {
+      const msg = result.error.message ?? JSON.stringify(result.error)
+      console.error('Resend API error:', msg)
+      return NextResponse.json(
+        { error: `Email provider rejected the request: ${msg}` },
+        { status: 500 }
+      )
+    }
+
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('Waitlist email error:', err)
-    return NextResponse.json({ error: 'Failed to send.' }, { status: 500 })
+    const msg = err instanceof Error ? err.message : 'Unexpected error'
+    console.error('Waitlist email error:', msg, err)
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

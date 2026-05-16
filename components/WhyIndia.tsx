@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useInView } from 'framer-motion'
 
 const cards = [
   {
@@ -10,9 +11,15 @@ const cards = [
     label: '01',
     labelColor: 'text-emerald-400 bg-emerald-500/10',
     title: 'Digital rails, built at scale',
-    body: 'UPI processed 18 billion transactions last month. Aadhaar covers 1.4 billion identities. India built in 5 years what took the US 30. The plumbing is done.',
-    stat: '18B',
+    rawStat: 18,
+    prefix: '',
+    suffix: 'B',
     statLabel: 'UPI transactions / month',
+    bullets: [
+      'UPI: 18B monthly transactions, growing 40% YoY.',
+      'Aadhaar covers 1.4B identities — digital by default.',
+      'Built in 5 years what took the US 30.',
+    ],
   },
   {
     borderColor: 'border-violet-500',
@@ -21,9 +28,15 @@ const cards = [
     label: '02',
     labelColor: 'text-violet-400 bg-violet-500/10',
     title: '350 million middle class. Growing.',
-    body: 'India will add more middle-class consumers in the next decade than the entire population of the US. Every category — fintech, health, food, logistics — is being rebuilt from scratch.',
-    stat: '350M',
+    rawStat: 350,
+    prefix: '',
+    suffix: 'M',
     statLabel: 'new consumers entering',
+    bullets: [
+      'More new consumers this decade than the entire US.',
+      'Fintech, health, food, logistics — all rebuilding from scratch.',
+      'Category leaders not yet decided. Entry cost still low.',
+    ],
   },
   {
     borderColor: 'border-amber-500',
@@ -32,11 +45,54 @@ const cards = [
     label: '03',
     labelColor: 'text-amber-400 bg-amber-500/10',
     title: 'The founder quality shift',
-    body: 'Ex-Google, ex-Meta, ex-McKinsey founders are choosing India. IIT graduates are no longer defaulting to the Valley. The talent is compounding at home.',
-    stat: '3x',
+    rawStat: 3,
+    prefix: '',
+    suffix: 'x',
     statLabel: 'unicorn creation rate (5yr)',
+    bullets: [
+      'Ex-Google, ex-Meta, ex-McKinsey choosing India over the Valley.',
+      'IIT graduates staying home. Talent compounding locally.',
+      'Unicorn creation rate tripled in the last five years.',
+    ],
   },
 ]
+
+function AnimatedStat({
+  target,
+  prefix,
+  suffix,
+}: {
+  target: number
+  prefix: string
+  suffix: string
+}) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const inView = useInView(ref, { once: true })
+  const [display, setDisplay] = useState(0)
+  const isDecimal = target < 10 && !Number.isInteger(target)
+
+  useEffect(() => {
+    if (!inView) return
+    const steps = 60
+    const interval = 1800 / steps
+    let step = 0
+    const timer = setInterval(() => {
+      step++
+      const eased = 1 - Math.pow(1 - step / steps, 3)
+      setDisplay(parseFloat((eased * target).toFixed(isDecimal ? 1 : 0)))
+      if (step >= steps) clearInterval(timer)
+    }, interval)
+    return () => clearInterval(timer)
+  }, [inView, target, isDecimal])
+
+  const formatted = isDecimal ? display.toFixed(1) : Math.round(display).toString()
+
+  return (
+    <span ref={ref}>
+      {prefix}{formatted}{suffix}
+    </span>
+  )
+}
 
 export default function WhyIndia() {
   return (
@@ -76,14 +132,25 @@ export default function WhyIndia() {
               <div className={`absolute -top-8 -right-8 w-40 h-40 ${card.bgOrb} rounded-full blur-2xl pointer-events-none transition-opacity duration-300 opacity-60 group-hover:opacity-100`} />
 
               <div className="relative z-10 mb-5">
-                <div className={`text-4xl font-black leading-none ${card.statColor}`}>
-                  {card.stat}
+                <div className={`text-5xl md:text-6xl font-black leading-none tabular-nums ${card.statColor}`}>
+                  <AnimatedStat
+                    target={card.rawStat}
+                    prefix={card.prefix}
+                    suffix={card.suffix}
+                  />
                 </div>
                 <div className="text-slate-500 text-xs mt-1">{card.statLabel}</div>
               </div>
 
-              <h3 className="relative z-10 text-base font-bold mb-3 text-white">{card.title}</h3>
-              <p className="relative z-10 text-slate-400 text-sm leading-relaxed">{card.body}</p>
+              <h3 className="relative z-10 text-base font-bold mb-4 text-white">{card.title}</h3>
+              <ul className="relative z-10 space-y-2">
+                {card.bullets.map((b, bi) => (
+                  <li key={bi} className="flex items-start gap-2 text-slate-400 text-sm leading-snug">
+                    <span className="mt-1.5 w-1 h-1 rounded-full bg-slate-500 flex-shrink-0" />
+                    {b}
+                  </li>
+                ))}
+              </ul>
             </motion.div>
           ))}
         </div>

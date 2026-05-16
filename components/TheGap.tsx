@@ -1,86 +1,37 @@
 'use client'
 
-import { Fragment } from 'react'
 import { motion } from 'framer-motion'
 
 const problems = [
   {
     number: '01',
+    icon: '🔒',
     accentColor: '#F87171',
     borderClass: 'border-l-4 border-red-400',
     labelClass: 'text-red-400',
-    title: "The deals aren't findable",
-    body: "India's best early-stage rounds don't show up on AngelList. They close through WhatsApp groups and warm intros. If you're not in the room, you're not in the deal.",
-    bullets: [
-      {
-        label: 'Where deals live',
-        color: 'bg-red-500/10 border border-red-500/25 text-red-400',
-        content: 'Top rounds close in private WhatsApp groups, founder networks, and warm VC referrals — not on any public platform',
-      },
-      {
-        label: 'Who controls access',
-        color: 'bg-orange-500/10 border border-orange-500/25 text-orange-400',
-        content: "Lead investors are India's tier-1 VCs who don't share deal flow with unknown foreign angels",
-      },
-      {
-        label: 'Speed of close',
-        color: 'bg-amber-500/10 border border-amber-500/25 text-amber-400',
-        content: 'Pre-Series A rounds often close in 2–3 weeks. Without a local scout, you never even see the email',
-      },
-    ],
+    stat: '95% of rounds close offline.',
+    desc: 'Top deals live in WhatsApp groups and warm VC intros. Not AngelList.',
     closer: 'Vestrs is already in those rooms. You plug straight in.',
   },
   {
     number: '02',
+    icon: '🗺️',
     accentColor: '#FBBF24',
     borderClass: 'border-l-4 border-amber-400',
     labelClass: 'text-amber-400',
-    title: 'The market is fragmented',
-    body: "200+ cities. 10+ regulatory layers. Dozens of sectors moving at different speeds. Without local knowledge, you're flying blind.",
-    bullets: [
-      {
-        label: 'Geography',
-        color: 'bg-amber-500/10 border border-amber-500/25 text-amber-400',
-        content: '28 states, 200+ cities — each with its own consumer behaviour, regulation, and competitive dynamics',
-      },
-      {
-        label: 'Sectors',
-        color: 'bg-orange-500/10 border border-orange-500/25 text-orange-400',
-        content: "Fintech, SaaS, D2C, agritech, healthtech — every vertical has its own cycle, jargon, and market map. Knowing one doesn't mean knowing another",
-      },
-      {
-        label: 'Intel',
-        color: 'bg-red-500/10 border border-red-500/25 text-red-400',
-        content: "Without on-ground advisors and founder relationships, you cannot separate true signal from noise in India's fast-moving startup scene",
-      },
-    ],
+    stat: '28 states. 200+ cities.',
+    desc: 'Every market moves differently. Local knowledge isn\'t optional.',
     closer: 'Vestrs gives you local depth without needing a local office.',
   },
   {
     number: '03',
+    icon: '⚖️',
     accentColor: '#A78BFA',
     borderClass: 'border-l-4 border-violet-400',
     labelClass: 'text-violet-400',
-    title: 'Investing from the US into India is structurally very complex',
-    body: 'Two regulatory systems. Zero handholding.',
-    bullets: [
-      {
-        label: 'India side',
-        color: 'bg-emerald-500/10 border border-emerald-500/25 text-emerald-400',
-        content: 'FEMA regulations, RBI approval layers, cross-border fund structuring',
-      },
-      {
-        label: 'US side',
-        color: 'bg-sky-500/10 border border-sky-500/25 text-sky-400',
-        content: 'PFIC classification, FBAR reporting, no QSBS exemption for foreign companies, FATCA compliance',
-      },
-      {
-        label: 'Both sides',
-        color: 'bg-violet-500/10 border border-violet-500/25 text-violet-400',
-        content: 'Currency risk, repatriation complexity, no standardised cap table docs, accounting standard gaps (GAAP vs IndAS)',
-      },
-    ],
-    closer: 'Most global investors read the first paragraph and close the tab. Vestrs handles all of it.',
+    stat: '2 regulatory systems.',
+    desc: 'FEMA + RBI on India side. PFIC + FBAR on US side. Most investors quit here.',
+    closer: 'Vestrs handles all of it. You just invest.',
   },
 ]
 
@@ -116,37 +67,21 @@ export default function TheGap() {
               whileHover={{ y: -3 }}
               className={`flex flex-col bg-white/[0.04] ${p.borderClass} border border-white/[0.08] rounded-2xl p-8 hover:bg-white/[0.07] hover:border-white/[0.14] transition-all duration-300`}
             >
-              <h3 className="text-base font-bold mb-3 text-white leading-snug">{p.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-5">{p.body}</p>
+              {/* Icon */}
+              <div className="text-4xl mb-5 leading-none">{p.icon}</div>
 
-              {/*
-                Grid with two columns:
-                  col 1 = max-content → all badges share the width of the widest badge in this card,
-                           so every text block starts at the same x-position
-                  col 2 = 1fr        → text fills remaining width and wraps cleanly within its column
-              */}
-              <div
-                className="mb-5"
-                style={{ display: 'grid', gridTemplateColumns: 'max-content 1fr', columnGap: '10px', rowGap: '10px' }}
-              >
-                {p.bullets.map((b) => (
-                  <Fragment key={b.label}>
-                    {/* Badge — whitespace-nowrap prevents the label itself from wrapping */}
-                    <span
-                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap self-start mt-0.5 ${b.color}`}
-                    >
-                      {b.label}
-                    </span>
-
-                    {/* Content — min-w-0 allows text to shrink and wrap within its column */}
-                    <p className="text-slate-400 text-xs leading-relaxed min-w-0">
-                      {b.content}
-                    </p>
-                  </Fragment>
-                ))}
+              {/* Big stat */}
+              <div className="text-xl font-black text-white mb-3 leading-snug">
+                {p.stat}
               </div>
 
-              <div className="mt-auto border-t border-white/8 pt-4">
+              {/* Short description */}
+              <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1">
+                {p.desc}
+              </p>
+
+              {/* Closer */}
+              <div className="border-t border-white/[0.08] pt-4">
                 <p className="text-slate-300 text-sm italic font-medium">{p.closer}</p>
               </div>
             </motion.div>

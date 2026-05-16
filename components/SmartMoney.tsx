@@ -4,49 +4,67 @@ import { motion } from 'framer-motion'
 
 const quotes = [
   {
-    quote: "India is where China was in 2010–2012. We are watching the birth of a $1 trillion startup ecosystem. The founders are world-class, the market is massive, and the digital infrastructure is finally ready. This is the single biggest opportunity in global venture today.",
-    author: "Sequoia India",
-    role: "Largest VC fund by AUM in India · 25+ unicorns backed",
+    initial: 'S',
+    badgeBg: 'bg-emerald-500/20 text-emerald-400',
+    aum: '$3B+',
+    quote: "India is where China was in 2010. The founders are world-class, the market is massive. This is the single biggest opportunity in global venture today.",
+    author: 'Sequoia India',
+    role: 'Largest VC by AUM in India · 25+ unicorns backed',
     accentColor: 'border-emerald-500/40',
     textAccent: 'text-emerald-400',
     bg: 'bg-emerald-950/30',
   },
   {
-    quote: "India is one of the most exciting investment destinations we have ever seen. The pace at which billion-dollar companies are being created here — across fintech, SaaS, consumer, logistics — is unlike anything we saw in the US or China at a comparable stage.",
-    author: "Tiger Global Management",
-    role: "$7B+ deployed in Indian startups · 50+ portfolio companies",
+    initial: 'T',
+    badgeBg: 'bg-sky-500/20 text-sky-400',
+    aum: '$7B+',
+    quote: "The pace at which billion-dollar companies are being created here is unlike anything we saw in the US or China at a comparable stage.",
+    author: 'Tiger Global Management',
+    role: '$7B+ deployed in Indian startups · 50+ portfolio companies',
     accentColor: 'border-sky-500/40',
     textAccent: 'text-sky-400',
     bg: 'bg-sky-950/30',
   },
   {
-    quote: "The quality of founders building in India today is exceptional. They are technically strong, globally aware, and solving real problems at scale. The talent density is on par with Silicon Valley — but the valuations and opportunity are far more compelling.",
-    author: "Lightspeed Venture Partners",
-    role: "Invested in Oyo, ShareChat, Udaan · $1.5B India AUM",
+    initial: 'L',
+    badgeBg: 'bg-violet-500/20 text-violet-400',
+    aum: '$1.5B',
+    quote: "The quality of founders building in India today is exceptional. Technically strong, globally aware, solving real problems at scale.",
+    author: 'Lightspeed Venture Partners',
+    role: 'Invested in Oyo, ShareChat, Udaan · $1.5B India AUM',
     accentColor: 'border-violet-500/40',
     textAccent: 'text-violet-400',
     bg: 'bg-violet-950/30',
   },
   {
-    quote: "I have made my biggest bets on India. 1.4 billion people, 650 million smartphone users, the fastest-growing internet economy on earth. When history looks back at this decade, India will be seen as the defining investment story of our era.",
-    author: "SoftBank Group",
-    role: "$10B+ deployed in India · Ola, Paytm, Meesho, Delhivery backed",
+    initial: 'S',
+    badgeBg: 'bg-amber-500/20 text-amber-400',
+    aum: '$10B+',
+    quote: "1.4 billion people, 650 million smartphone users, the fastest-growing internet economy on earth. India will be the defining investment story of this era.",
+    author: 'SoftBank Group',
+    role: '$10B+ deployed in India · Ola, Paytm, Meesho backed',
     accentColor: 'border-amber-500/40',
     textAccent: 'text-amber-400',
     bg: 'bg-amber-950/30',
   },
   {
-    quote: "The calibre of founders coming from India has surpassed our expectations every year. They are solving hard, consequential problems with global ambition. We have tripled our India cohort intake because the quality demands it.",
-    author: "Y Combinator",
-    role: "150+ Indian-founded companies backed · Razorpay, Groww, Meesho alumni",
+    initial: 'Y',
+    badgeBg: 'bg-rose-500/20 text-rose-400',
+    aum: '150+',
+    quote: "We have tripled our India cohort intake because the founder quality demands it. They solve hard, consequential problems with global ambition.",
+    author: 'Y Combinator',
+    role: '150+ Indian-founded companies · Razorpay, Groww, Meesho alumni',
     accentColor: 'border-rose-500/40',
     textAccent: 'text-rose-400',
     bg: 'bg-rose-950/30',
   },
   {
-    quote: "India is not just a domestic opportunity — Indian founders are building category-defining companies that will compete globally. We are at an inflection point. The next decade in India will generate more venture wealth than the prior thirty.",
-    author: "Accel India",
-    role: "Flipkart, Freshworks early backer · $2.8B India AUM",
+    initial: 'A',
+    badgeBg: 'bg-cyan-500/20 text-cyan-400',
+    aum: '$2.8B',
+    quote: "Indian founders are building category-defining companies that will compete globally. The next decade will generate more venture wealth than the prior thirty.",
+    author: 'Accel India',
+    role: 'Flipkart, Freshworks early backer · $2.8B India AUM',
     accentColor: 'border-cyan-500/40',
     textAccent: 'text-cyan-400',
     bg: 'bg-cyan-950/30',
@@ -130,12 +148,23 @@ export default function SmartMoney() {
               whileHover={{ y: -4 }}
               className={`relative ${q.bg} border ${q.accentColor} rounded-2xl p-7 hover:border-opacity-60 transition-all duration-300`}
             >
+              {/* Top row: initial badge + AUM */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-lg flex-shrink-0 ${q.badgeBg}`}>
+                  {q.initial}
+                </div>
+                <div className="text-[#D4AF37] text-xl font-black leading-none">
+                  {q.aum}
+                  <div className="text-slate-600 text-[10px] font-normal mt-0.5 tracking-wider uppercase">AUM deployed</div>
+                </div>
+              </div>
+
               {/* Quote mark */}
-              <div className={`text-5xl font-black leading-none mb-4 ${q.textAccent} opacity-40`}>&ldquo;</div>
+              <div className={`text-4xl font-black leading-none mb-3 ${q.textAccent} opacity-40`}>&ldquo;</div>
               <p className="text-slate-300 text-sm leading-relaxed mb-6 italic">
                 {q.quote}
               </p>
-              <div className="border-t border-white/8 pt-4">
+              <div className="border-t border-white/[0.08] pt-4">
                 <div className={`font-bold text-sm ${q.textAccent}`}>{q.author}</div>
                 <div className="text-slate-500 text-xs mt-1">{q.role}</div>
               </div>

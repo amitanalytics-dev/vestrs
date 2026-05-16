@@ -1,5 +1,6 @@
 import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
+import StatsStrip from '@/components/StatsStrip'
 import SiliconValley from '@/components/SiliconValley'
 import WhyIndia from '@/components/WhyIndia'
 import TheGap from '@/components/TheGap'
@@ -16,6 +17,7 @@ export default function Home() {
     <main>
       <Nav />
       <Hero />
+      <StatsStrip />
       <GoldDivider />
       <WhyIndia />
       <GoldDivider />
