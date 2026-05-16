@@ -73,7 +73,7 @@ export default function Nav() {
             whileHover={{ scale: 1.03, y: -1 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="hidden lg:inline-flex relative overflow-hidden bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white text-sm font-bold px-5 py-2.5 rounded-full group"
+            className="hidden lg:inline-flex relative overflow-hidden bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white text-xs font-bold px-4 py-2 rounded-full group"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
             <span className="relative z-10">Join Waitlist</span>
