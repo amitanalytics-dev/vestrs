@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const links = [
+  { label: 'Home',            href: '#hero' },
   { label: 'The Opportunity', href: '#why-india' },
   { label: 'The Parallel',    href: '#the-parallel' },
   { label: 'The Problem',     href: '#the-gap' },
@@ -27,20 +28,15 @@ export default function Nav() {
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      style={{
-        borderBottom: '3px solid transparent',
-        borderImage: 'linear-gradient(90deg, rgba(255,215,0,0) 0%, #D4AF37 10%, #FFD700 40%, #FFFAAA 50%, #FFD700 60%, #D4AF37 90%, rgba(255,215,0,0) 100%) 1',
-        boxShadow: scrolled ? '0 4px 18px rgba(255,215,0,0.3)' : 'none',
-      }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-[#07101D]/95 backdrop-blur-xl'
+          ? 'bg-[#07101D]/95 backdrop-blur-xl shadow-[0_1px_20px_rgba(0,0,0,0.5)]'
           : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex flex-col flex-shrink-0">
+        <div className="flex flex-col flex-shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           <div className="text-xl font-bold tracking-tight leading-none">
             <span className="text-gradient-teal">VESTRS</span>
           </div>
@@ -95,6 +91,14 @@ export default function Nav() {
           </button>
         </div>
       </div>
+
+      {/* Gold bottom border */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        height: '3px',
+        background: 'linear-gradient(90deg, #A67C00 0%, #FFD700 25%, #FFFAAA 50%, #FFD700 75%, #A67C00 100%)',
+        boxShadow: '0 0 14px 4px rgba(255,215,0,0.5)',
+      }} />
 
       {/* Mobile menu */}
       <AnimatePresence>

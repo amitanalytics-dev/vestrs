@@ -152,7 +152,7 @@ function HeroGrid() {
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-[#07101D] via-[#0A1828] to-[#060E1A]">
+    <section id="hero" className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-[#07101D] via-[#0A1828] to-[#060E1A]">
       <StarField />
 
       {/* Gradient orbs */}
