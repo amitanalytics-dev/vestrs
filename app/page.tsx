@@ -2,8 +2,6 @@ import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
 import SiliconValley from '@/components/SiliconValley'
 import WhyIndia from '@/components/WhyIndia'
-import Proof from '@/components/Proof'
-import UnicornGrid from '@/components/UnicornGrid'
 import TheGap from '@/components/TheGap'
 import Solution from '@/components/Solution'
 import Returns from '@/components/Returns'
@@ -19,8 +17,6 @@ export default function Home() {
       <Hero />
       <WhyIndia />
       <SiliconValley />
-      <Proof />
-      <UnicornGrid />
       <TheGap />
       <Solution />
       <Returns />
