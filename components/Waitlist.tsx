@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const benefits = [
-  '"Why India, Why Now" — our flagship deep-dive research report',
   'Sector-by-sector breakdowns: fintech, SaaS, D2C, climate',
   'Curated deal previews before public rounds',
   'Direct founder access for waitlist members',
@@ -16,13 +15,15 @@ const dotColors = [
 ]
 
 export default function Waitlist() {
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.includes('@')) return
+    if (!name.trim() || !email.includes('@')) return
     setLoading(true)
     setTimeout(() => { setLoading(false); setSubmitted(true) }, 1200)
   }
@@ -50,7 +51,7 @@ export default function Waitlist() {
               You start by understanding.
             </h2>
             <p className="text-slate-400 text-base leading-relaxed mb-10">
-              Join the Vestrs waitlist. Get the research, the insights, and the deals — before anyone else.
+              Join the Vestrs waitlist. Get the insights and the deals — before anyone else.
             </p>
 
             <div className="space-y-3.5">
@@ -83,7 +84,7 @@ export default function Waitlist() {
                 <motion.div key="form" initial={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="mb-2">
                     <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full">
-                      Access is limited · Cohort-based · Batches of 50
+                      Access is time-limited · 100 founding member spots only
                     </span>
                   </div>
 
@@ -91,6 +92,21 @@ export default function Waitlist() {
                   <p className="text-slate-500 text-sm mb-8">We&apos;re opening the next cohort soon.</p>
 
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your full name"
+                      required
+                      className="w-full bg-white/[0.06] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder-slate-600 text-base outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-200"
+                    />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+1 555 000 0000"
+                      className="w-full bg-white/[0.06] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder-slate-600 text-base outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-200"
+                    />
                     <input
                       type="email"
                       value={email}
@@ -129,7 +145,7 @@ export default function Waitlist() {
                   </div>
                   <h3 className="text-2xl font-bold mb-3 text-white">You&apos;re on the list.</h3>
                   <p className="text-slate-400 text-sm leading-relaxed max-w-xs mx-auto">
-                    We&apos;ll reach out when the next cohort opens. Expect research, insights, and deal previews first.
+                    We&apos;ll reach out when the next cohort opens. Expect insights and deal previews first.
                   </p>
                 </motion.div>
               )}

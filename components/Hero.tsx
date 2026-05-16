@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import dynamic from 'next/dynamic'
 import GuidedText from './GuidedText'
-
-const GlobeVisual = dynamic(() => import('./GlobeVisual'), { ssr: false })
 
 type Star = { top: string; left: string; size: string; opacity: number }
 
@@ -46,11 +43,6 @@ export default function Hero() {
         backgroundSize: '60px 60px',
       }} />
 
-      {/* Globe */}
-      <div className="absolute right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 w-[85vw] md:w-[52vw] lg:w-[50vw] h-[85vw] md:h-[52vw] lg:h-[50vw] max-w-[680px] max-h-[680px] opacity-50 md:opacity-90">
-        <GlobeVisual />
-      </div>
-
       {/* Left fade */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#07101D] via-[#07101D]/85 md:via-[#07101D]/60 to-transparent pointer-events-none z-10" />
 
@@ -63,7 +55,7 @@ export default function Hero() {
             className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 text-sm text-emerald-400 font-medium mb-8"
           >
             <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-            Early Access · Cohort-based · 50 seats per round
+            Limited time · 100 founding member spots only
           </motion.div>
 
           <motion.h1
@@ -106,17 +98,7 @@ export default function Hero() {
               className="relative overflow-hidden bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white font-bold px-8 py-4 rounded-full text-base group text-center shadow-lg shadow-emerald-900/40"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-              <span className="relative z-10">Join the Waitlist</span>
-            </motion.a>
-
-            <motion.a
-              href="#why-india"
-              whileHover={{ scale: 1.02, y: -1 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="border-2 border-white/15 text-slate-300 px-8 py-4 rounded-full text-base hover:border-emerald-400/50 hover:text-emerald-400 transition-colors duration-200 text-center font-medium"
-            >
-              Why India, Why Now ↓
+              <span className="relative z-10">Join the club — become a founding member</span>
             </motion.a>
           </motion.div>
         </div>
