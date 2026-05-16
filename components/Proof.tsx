@@ -73,9 +73,58 @@ const companies: [string, string, string, string, string, string][] = [
   ['PharmEasy',    'pharmeasy.in',     '#22c55e', 'Healthtech',  '4x',    '$1.5B'],
 ]
 
+const row1 = companies.slice(0, 17)
+const row2 = companies.slice(17, 34)
+const row3 = companies.slice(34)
+
+function MarqueeRow({
+  items,
+  reverse,
+  duration,
+}: {
+  items: typeof companies
+  reverse?: boolean
+  duration: number
+}) {
+  const doubled = [...items, ...items]
+  return (
+    <div className="relative overflow-hidden py-1">
+      <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#060D18] to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#060D18] to-transparent z-10 pointer-events-none" />
+      <div
+        className={`flex gap-2 w-max ${reverse ? 'proof-row-reverse' : 'proof-row'}`}
+        style={{ animationDuration: `${duration}s` }}
+      >
+        {doubled.map(([name, , color, industry, multiple], i) => (
+          <span
+            key={i}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full whitespace-nowrap flex-shrink-0 cursor-default select-none"
+            style={{
+              background: hex2rgba(color, 0.1),
+              border: `0.5px solid ${hex2rgba(color, 0.28)}`,
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
+            <span className="text-[11px] font-semibold text-white/80">{name}</span>
+            <span
+              className="text-[9px] px-1 py-px rounded"
+              style={{ background: hex2rgba(color, 0.15), color }}
+            >
+              {industry}
+            </span>
+            <span className="text-[11px] font-black" style={{ color: mColor(multiple) }}>
+              {multiple}
+            </span>
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Proof() {
   return (
-    <section id="proof" className="relative py-32 bg-[#060D18] overflow-hidden">
+    <section id="proof" className="relative py-24 bg-[#060D18] overflow-hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-500/[0.05] rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-sky-500/[0.04] rounded-full blur-[100px] pointer-events-none" />
 
@@ -87,7 +136,7 @@ export default function Proof() {
           className="text-center mb-4"
         >
           <span className="text-violet-400 text-xs font-bold tracking-[0.2em] uppercase">
-            Signals, Not Exceptions
+            The Returns
           </span>
         </motion.div>
 
@@ -117,7 +166,7 @@ export default function Proof() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.15 }}
-          className="flex justify-center gap-5 mb-12 flex-wrap"
+          className="flex justify-center gap-5 mb-10 flex-wrap"
         >
           {([['100x+', '#f0abfc'], ['20x+', '#4ade80'], ['10x+', '#86efac'], ['5x+', '#facc15'], ['<5x', '#fb923c']] as [string, string][]).map(([label, color]) => (
             <span key={label} className="flex items-center gap-1.5 text-xs text-slate-500">
@@ -126,90 +175,22 @@ export default function Proof() {
             </span>
           ))}
         </motion.div>
+      </div>
 
-        {/* 3-row window — scroll to reveal all 50 companies */}
-        <div className="relative">
-          {/* Top fade — masks rows that have scrolled past */}
-          <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-[#060D18] to-transparent z-10 pointer-events-none" />
-          {/* Bottom hint — shows more content below */}
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#060D18] via-[#060D18]/70 to-transparent z-10 pointer-events-none" />
+      {/* Marquee rows — full bleed, no max-w constraint */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.2 }}
+        className="flex flex-col gap-3"
+      >
+        <MarqueeRow items={row1} duration={44} />
+        <MarqueeRow items={row2} duration={58} reverse />
+        <MarqueeRow items={row3} duration={36} />
+      </motion.div>
 
-          <div
-            className="overflow-y-auto [&::-webkit-scrollbar]:hidden"
-            style={{ maxHeight: '500px', scrollbarWidth: 'none' }}
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 pb-8">
-              {companies.map(([name, domain, color, industry, multiple, valuation], i) => (
-                <motion.div
-                  key={name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-30px' }}
-                  transition={{ duration: 0.4, delay: (i % 10) * 0.03 }}
-                  whileHover={{ y: -4, scale: 1.02 }}
-                  className="flex flex-col bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 hover:bg-white/[0.07] hover:border-white/[0.15] transition-all duration-300 cursor-default"
-                >
-                  {/* Logo + name */}
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <div
-                      className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center relative overflow-hidden"
-                      style={{ background: hex2rgba(color, 0.18) }}
-                    >
-                      <span className="font-black text-xs absolute select-none" style={{ color }}>
-                        {name.charAt(0)}
-                      </span>
-                      <img
-                        src={`https://www.google.com/s2/favicons?domain=${domain}&sz=128`}
-                        alt={name}
-                        width={24}
-                        height={24}
-                        className="relative z-10 object-contain"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                      />
-                    </div>
-                    <span className="font-semibold text-xs text-white truncate leading-tight">{name}</span>
-                  </div>
-
-                  {/* Industry */}
-                  <div className="mb-3">
-                    <span
-                      className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
-                      style={{ background: hex2rgba(color, 0.12), color }}
-                    >
-                      {industry}
-                    </span>
-                  </div>
-
-                  {/* Multiple + Valuation */}
-                  <div className="mt-auto border-t border-white/[0.08] pt-3 flex items-end justify-between gap-1 min-w-0">
-                    <div className="min-w-0">
-                      <div
-                        className="font-black text-lg leading-none"
-                        style={{ color: mColor(multiple) }}
-                      >
-                        {multiple}
-                      </div>
-                      <div className="text-slate-600 text-[9px] mt-0.5 whitespace-nowrap">max investor return</div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <div className="font-bold text-sm leading-none text-slate-300">{valuation}</div>
-                      <div className="text-slate-600 text-[9px] mt-0.5">valuation</div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Scroll hint */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 text-slate-500 text-xs pointer-events-none">
-            <svg className="w-3 h-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-            scroll to see all 50
-          </div>
-        </div>
-
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -218,7 +199,7 @@ export default function Proof() {
           className="text-center text-slate-500 text-sm mt-10"
         >
           These early-stage investors turned{' '}
-          <span className="text-white font-semibold">₹1 into ₹8–₹500</span>.
+          <span className="text-white font-semibold">$1 into $8–$500</span>.
           {' '}The next crop is forming now.
         </motion.p>
       </div>
