@@ -39,7 +39,7 @@ export default function Nav() {
           <div className="text-xl font-bold tracking-tight leading-none">
             <span className="text-gradient-teal">VESTRS</span>
           </div>
-          <span className="text-[9px] font-bold tracking-[0.12em] uppercase mt-0.5 leading-none" style={{ color: '#D4AF37' }}>
+          <span className="text-gold-glitter text-[9px] font-bold tracking-[0.12em] uppercase mt-0.5 leading-none">
             Global Capital · Indian Determination
           </span>
         </div>

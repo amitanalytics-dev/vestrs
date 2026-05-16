@@ -102,3 +102,28 @@ body {
   animation: tickerScroll linear infinite reverse;
 }
 .proof-row-reverse:hover { animation-play-state: paused; }
+
+/* ─── Gold shimmer tagline ───────────────────────────────── */
+@keyframes goldGlitter {
+  0%   { background-position: -300% center; }
+  100% { background-position: 300% center; }
+}
+
+.text-gold-glitter {
+  background: linear-gradient(
+    90deg,
+    #A67C00 0%,
+    #FFD700 20%,
+    #FFF1A8 35%,
+    #FFD700 50%,
+    #FFC200 65%,
+    #FFF1A8 80%,
+    #A67C00 100%
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldGlitter 3s linear infinite;
+  text-shadow: none;
+}
