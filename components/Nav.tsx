@@ -27,9 +27,14 @@ export default function Nav() {
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
+      style={{
+        borderBottom: '3px solid transparent',
+        borderImage: 'linear-gradient(90deg, rgba(255,215,0,0) 0%, #D4AF37 10%, #FFD700 40%, #FFFAAA 50%, #FFD700 60%, #D4AF37 90%, rgba(255,215,0,0) 100%) 1',
+        boxShadow: scrolled ? '0 4px 18px rgba(255,215,0,0.3)' : 'none',
+      }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-[#07101D]/95 backdrop-blur-xl shadow-[0_1px_20px_rgba(0,0,0,0.5)]'
+          ? 'bg-[#07101D]/95 backdrop-blur-xl'
           : 'bg-transparent'
       }`}
     >
