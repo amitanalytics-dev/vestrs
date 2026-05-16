@@ -51,7 +51,11 @@ export default function Nav() {
             <a
               key={l.href}
               href={l.href}
-              className="hover:text-white transition-colors duration-200 whitespace-nowrap"
+              onClick={(e) => {
+                e.preventDefault()
+                document.querySelector(l.href)?.scrollIntoView({ behavior: 'smooth' })
+              }}
+              className="hover:text-white transition-colors duration-200 whitespace-nowrap cursor-pointer"
             >
               {l.label}
             </a>
@@ -62,10 +66,14 @@ export default function Nav() {
         <div className="flex items-center gap-3">
           <motion.a
             href="#waitlist"
+            onClick={(e) => {
+              e.preventDefault()
+              document.querySelector('#waitlist')?.scrollIntoView({ behavior: 'smooth' })
+            }}
             whileHover={{ scale: 1.03, y: -1 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="relative overflow-hidden bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white text-sm font-bold px-5 py-2.5 rounded-full group"
+            className="hidden lg:inline-flex relative overflow-hidden bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white text-sm font-bold px-5 py-2.5 rounded-full group"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
             <span className="relative z-10">Join Waitlist</span>
@@ -99,7 +107,13 @@ export default function Nav() {
                 <a
                   key={l.href}
                   href={l.href}
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setOpen(false)
+                    setTimeout(() => {
+                      document.querySelector(l.href)?.scrollIntoView({ behavior: 'smooth' })
+                    }, 150)
+                  }}
                   className="py-4 text-base text-slate-300 hover:text-white active:text-white transition-colors border-b border-white/[0.06] last:border-0 font-medium"
                 >
                   {l.label}
@@ -107,7 +121,13 @@ export default function Nav() {
               ))}
               <a
                 href="#waitlist"
-                onClick={() => setOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setOpen(false)
+                  setTimeout(() => {
+                    document.querySelector('#waitlist')?.scrollIntoView({ behavior: 'smooth' })
+                  }, 150)
+                }}
                 className="mt-4 mb-2 text-center bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white text-base font-bold py-4 rounded-xl"
               >
                 Join Waitlist
