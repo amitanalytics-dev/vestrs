@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const links = [
-  { label: 'Why India',    href: '#why-india' },
-  { label: 'The Problem',  href: '#the-gap' },
-  { label: 'Proof',        href: '#proof' },
-  { label: 'Solution',     href: '#solution' },
-  { label: 'Returns',      href: '#returns' },
-  { label: 'The Parallel', href: '#the-parallel' },
+  { label: 'The Opportunity', href: '#why-india' },
+  { label: 'The Parallel',    href: '#the-parallel' },
+  { label: 'The Problem',     href: '#the-gap' },
+  { label: 'The Solution',    href: '#solution' },
+  { label: 'The Returns',     href: '#returns' },
+  { label: 'Smart Money',     href: '#smart-money' },
 ]
 
 export default function Nav() {
@@ -92,19 +92,26 @@ export default function Nav() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-[#07101D]/98 border-t border-white/8 overflow-hidden"
+            className="lg:hidden bg-[#07101D]/98 backdrop-blur-xl border-t border-white/8 overflow-hidden"
           >
-            <div className="px-6 py-4 flex flex-col gap-1">
+            <div className="px-6 py-3 flex flex-col">
               {links.map(l => (
                 <a
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="py-2.5 text-sm text-slate-400 hover:text-white transition-colors border-b border-white/5 last:border-0"
+                  className="py-4 text-base text-slate-300 hover:text-white active:text-white transition-colors border-b border-white/[0.06] last:border-0 font-medium"
                 >
                   {l.label}
                 </a>
               ))}
+              <a
+                href="#waitlist"
+                onClick={() => setOpen(false)}
+                className="mt-4 mb-2 text-center bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white text-base font-bold py-4 rounded-xl"
+              >
+                Join Waitlist
+              </a>
             </div>
           </motion.div>
         )}
