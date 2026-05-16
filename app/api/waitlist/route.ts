@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     await resend.emails.send({
       from: 'Vestrs Waitlist <onboarding@resend.dev>',
-      to: ['amit_tyagi2012@pgp.isb.edu'],
+      to: ['ir@vestrs.com'],
       subject: `New waitlist signup — ${name}`,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;">
