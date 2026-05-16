@@ -21,11 +21,22 @@ export default function Waitlist() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim() || !email.includes('@')) return
     setLoading(true)
-    setTimeout(() => { setLoading(false); setSubmitted(true) }, 1200)
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email }),
+      })
+      if (res.ok) {
+        setSubmitted(true)
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
