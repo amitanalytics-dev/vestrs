@@ -92,3 +92,13 @@ body {
 .ticker-bottom:hover {
   animation-play-state: paused;
 }
+
+.proof-row {
+  animation: tickerScroll linear infinite;
+}
+.proof-row:hover { animation-play-state: paused; }
+
+.proof-row-reverse {
+  animation: tickerScroll linear infinite reverse;
+}
+.proof-row-reverse:hover { animation-play-state: paused; }

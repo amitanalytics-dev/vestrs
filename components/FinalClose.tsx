@@ -35,7 +35,7 @@ export default function FinalClose() {
           className="text-5xl md:text-6xl lg:text-7xl font-black leading-[1.08] tracking-tight mb-10 text-white"
         >
           The question is:{' '}
-          <span className="text-gradient-teal">will you be early?</span>
+          <span className="text-gradient-teal">will you catch the train early?</span>
         </motion.h2>
 
         <motion.div
@@ -52,7 +52,7 @@ export default function FinalClose() {
             className="relative overflow-hidden inline-flex items-center gap-2 bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white font-bold px-10 py-4 rounded-full text-base group shadow-2xl shadow-emerald-900/40"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-            <span className="relative z-10">Join the Waitlist</span>
+            <span className="relative z-10">Join the club — become a founding member</span>
             <span className="relative z-10">
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

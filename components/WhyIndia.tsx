@@ -75,10 +75,6 @@ export default function WhyIndia() {
               {/* Card orb */}
               <div className={`absolute -top-8 -right-8 w-40 h-40 ${card.bgOrb} rounded-full blur-2xl pointer-events-none transition-opacity duration-300 opacity-60 group-hover:opacity-100`} />
 
-              <div className={`relative z-10 inline-flex items-center justify-center w-8 h-8 rounded-lg ${card.labelColor} text-xs font-black mb-5`}>
-                {card.label}
-              </div>
-
               <div className="relative z-10 mb-5">
                 <div className={`text-4xl font-black leading-none ${card.statColor}`}>
                   {card.stat}

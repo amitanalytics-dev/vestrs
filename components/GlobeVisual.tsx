@@ -143,9 +143,11 @@ export default function GlobeVisual() {
     container.appendChild(ol)
 
     const ctx2 = ol.getContext('2d')!
+    const dpr = window.devicePixelRatio || 1
     let W = container.clientWidth  || 500
     let H = container.clientHeight || 500
-    ol.width = W; ol.height = H
+    ol.width = W * dpr; ol.height = H * dpr
+    ctx2.scale(dpr, dpr)
 
     import('three').then(THREE => {
       const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true })
@@ -176,14 +178,75 @@ export default function GlobeVisual() {
           shininess:   22,
         }),
       ))
+      // Night city lights — additive on dark side only
+      const sunDir = new THREE.Vector3(5, 3, 5).normalize()
       gg.add(new THREE.Mesh(
-        new THREE.SphereGeometry(1.028, 32, 32),
-        new THREE.MeshPhongMaterial({ color: 0x3366ff, transparent: true, opacity: 0.06, side: THREE.FrontSide }),
+        new THREE.SphereGeometry(1.001, 64, 64),
+        new THREE.ShaderMaterial({
+          uniforms: {
+            nightMap:     { value: ldr.load('https://unpkg.com/three-globe/example/img/earth-night.jpg') },
+            sunDirection: { value: sunDir },
+          },
+          vertexShader: `
+            varying vec3 vWorldNormal;
+            varying vec2 vUv;
+            void main() {
+              vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+              vUv = uv;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            uniform sampler2D nightMap;
+            uniform vec3 sunDirection;
+            varying vec3 vWorldNormal;
+            varying vec2 vUv;
+            void main() {
+              float d = dot(vWorldNormal, sunDirection);
+              float nightMix = smoothstep(0.15, -0.25, d);
+              vec4 c = texture2D(nightMap, vUv);
+              gl_FragColor = vec4(c.rgb * 2.5 * nightMix, nightMix * 0.95);
+            }
+          `,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
       ))
-      scene.add(new THREE.AmbientLight(0x334455, 0.9))
-      const sun = new THREE.DirectionalLight(0xffeedd, 1.3)
+
+      // Fresnel atmosphere limb glow
+      gg.add(new THREE.Mesh(
+        new THREE.SphereGeometry(1.15, 48, 48),
+        new THREE.ShaderMaterial({
+          vertexShader: `
+            varying vec3 vNormal;
+            void main() {
+              vNormal = normalize(normalMatrix * normal);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            varying vec3 vNormal;
+            void main() {
+              float intensity = pow(max(0.0, 0.72 - dot(vNormal, vec3(0.0, 0.0, 1.0))), 3.5);
+              intensity = clamp(intensity, 0.0, 1.0);
+              gl_FragColor = vec4(0.08, 0.55, 1.0, 1.0) * intensity;
+            }
+          `,
+          side: THREE.BackSide,
+          blending: THREE.AdditiveBlending,
+          transparent: true,
+          depthWrite: false,
+        }),
+      ))
+
+      scene.add(new THREE.AmbientLight(0x1e3a5f, 1.1))
+      const sun = new THREE.DirectionalLight(0xffeedd, 1.4)
       sun.position.set(5, 3, 5)
       scene.add(sun)
+      const rim = new THREE.DirectionalLight(0x0ea5e9, 0.5)
+      rim.position.set(-4, 0, -3)
+      scene.add(rim)
 
       function ll(lat: number, lng: number, r = 1.013) {
         const phi   = (90 - lat) * Math.PI / 180
@@ -210,7 +273,8 @@ export default function GlobeVisual() {
       gg.rotation.y = IR
       gg.rotation.x = 0.28
 
-      // Drag interaction only (no auto-spin)
+      let lastInteract = 0
+
       let drag = false
       const pM = { x: 0, y: 0 }
       const vel = { x: 0, y: 0 }
@@ -228,7 +292,7 @@ export default function GlobeVisual() {
         vel.x = dy * 0.0004; vel.y = dx * 0.0004
         pM.x = e.clientX; pM.y = e.clientY
       }
-      const onMouseUp = () => { drag = false; container.style.cursor = 'grab' }
+      const onMouseUp = () => { drag = false; container.style.cursor = 'grab'; lastInteract = performance.now() }
       const onWheel = (e: WheelEvent) => {
         e.preventDefault()
         targetZ = Math.max(1.6, Math.min(2.8, targetZ + e.deltaY * 0.003))
@@ -245,7 +309,7 @@ export default function GlobeVisual() {
         vel.x = dy * 0.0004; vel.y = dx * 0.0004
         pTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY }
       }
-      const onTouchEnd = () => { pTouch = null }
+      const onTouchEnd = () => { pTouch = null; lastInteract = performance.now() }
 
       container.addEventListener('mousedown', onMouseDown)
       window.addEventListener('mousemove', onMouseMove)
@@ -377,6 +441,31 @@ export default function GlobeVisual() {
         ctx2.restore()
       }
 
+      const indiaVec = ll(20.6, 78.96, 1.002)
+
+      function drawIndiaGlow(now: number, camDir: ReturnType<typeof camera.position.clone>) {
+        const wp = indiaVec.clone().applyMatrix4(gg.matrixWorld)
+        const facing = wp.clone().normalize().dot(camDir)
+        if (facing < 0.05) return
+        const proj = wp.clone().project(camera)
+        const px = ((proj.x + 1) / 2) * W
+        const py = ((-proj.y + 1) / 2) * H
+        const pulse = 0.5 + 0.5 * Math.sin(now * 0.0012)
+        const radius = 70 + pulse * 25
+        const a = Math.min(1, facing * 1.5) * (0.22 + pulse * 0.12)
+        ctx2.save()
+        const grad = ctx2.createRadialGradient(px, py, 0, px, py, radius)
+        grad.addColorStop(0,    `rgba(255, 153, 51, ${a})`)
+        grad.addColorStop(0.35, `rgba(255, 153, 51, ${a * 0.5})`)
+        grad.addColorStop(0.7,  `rgba(220, 100, 20, ${a * 0.15})`)
+        grad.addColorStop(1,    'rgba(200, 80, 0, 0)')
+        ctx2.fillStyle = grad
+        ctx2.beginPath()
+        ctx2.arc(px, py, radius, 0, Math.PI * 2)
+        ctx2.fill()
+        ctx2.restore()
+      }
+
       function draw2D() {
         ctx2.clearRect(0, 0, W, H)
         gg.updateMatrixWorld()
@@ -392,12 +481,14 @@ export default function GlobeVisual() {
             : 1.0
         alpha = Math.max(0, Math.min(1, alpha))
 
+        drawIndiaGlow(now2, camDir)
         GROUPS[gIdx].forEach((u, i) => drawPin(u, i, alpha, now2, camDir))
       }
 
       const ro = new ResizeObserver(() => {
         W = container.clientWidth; H = container.clientHeight
-        ol.width = W; ol.height = H
+        ol.width = W * dpr; ol.height = H * dpr
+        ctx2.setTransform(dpr, 0, 0, dpr, 0, 0)
         renderer.setSize(W, H)
         camera.aspect = W / H
         camera.updateProjectionMatrix()
@@ -406,11 +497,18 @@ export default function GlobeVisual() {
 
       const animate = () => {
         animId = requestAnimationFrame(animate)
-        // Dampen drag velocity only — no auto-rotation
         if (!drag && !pTouch) {
           gg.rotation.y += vel.y
           gg.rotation.x = Math.max(0.12, Math.min(0.45, gg.rotation.x + vel.x))
           vel.x *= 0.92; vel.y *= 0.92
+          // After 2s idle, tween back so India always stays in view
+          if (performance.now() - lastInteract > 2000) {
+            let dy = IR - gg.rotation.y
+            while (dy > Math.PI)  dy -= 2 * Math.PI
+            while (dy < -Math.PI) dy += 2 * Math.PI
+            gg.rotation.y += dy * 0.015
+            gg.rotation.x += (0.28 - gg.rotation.x) * 0.015
+          }
         }
         camera.position.z += (targetZ - camera.position.z) * 0.1
         renderer.render(scene, camera)

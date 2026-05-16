@@ -61,7 +61,7 @@ const problems = [
     accentColor: '#A78BFA',
     borderClass: 'border-l-4 border-violet-400',
     labelClass: 'text-violet-400',
-    title: 'Investing from the US into India is structurally broken',
+    title: 'Investing from the US into India is structurally very complex',
     body: 'Two regulatory systems. Zero handholding.',
     bullets: [
       {
@@ -116,10 +116,6 @@ export default function TheGap() {
               whileHover={{ y: -3 }}
               className={`flex flex-col bg-white/[0.04] ${p.borderClass} border border-white/[0.08] rounded-2xl p-8 hover:bg-white/[0.07] hover:border-white/[0.14] transition-all duration-300`}
             >
-              <div className={`inline-flex px-2 py-1 rounded-lg text-xs font-black mb-5 bg-white/[0.07] ${p.labelClass}`}>
-                {p.number}
-              </div>
-
               <h3 className="text-base font-bold mb-3 text-white leading-snug">{p.title}</h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-5">{p.body}</p>
 
