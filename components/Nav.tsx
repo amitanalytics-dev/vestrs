@@ -38,23 +38,15 @@ export default function Nav() {
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <div className="flex flex-col flex-shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <div
-            className="px-4 py-2"
-            style={{
-              backgroundColor: '#0A0F38',
-              border: '1px solid rgba(255,255,255,0.22)',
-            }}
-          >
-            <span style={{
-              fontFamily: 'Georgia, "Times New Roman", serif',
-              fontSize: '14px',
-              fontWeight: '400',
-              letterSpacing: '0.35em',
-              color: '#FFFFFF',
-            }}>
-              VESTRS
-            </span>
-          </div>
+          <span style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: '16px',
+            fontWeight: '400',
+            letterSpacing: '0.35em',
+            color: '#FFFFFF',
+          }}>
+            VESTRS
+          </span>
           <span className="text-gold-glitter text-[9px] font-bold tracking-[0.12em] uppercase mt-1 leading-none">
             Global Capital · Indian Determination
           </span>
