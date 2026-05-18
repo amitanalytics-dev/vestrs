@@ -26,8 +26,7 @@ export default function OgImage() {
 
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '48px' }}>
-          <span style={{ fontSize: '28px', fontWeight: 700, color: '#ffffff', letterSpacing: '0.1em' }}>VESTRS</span>
-          <span style={{ fontSize: '28px', fontWeight: 700, color: '#059669', marginLeft: '2px' }}>.</span>
+          <span style={{ fontSize: '22px', fontWeight: 400, color: '#ffffff', letterSpacing: '0.35em', fontFamily: 'serif' }}>VESTRS</span>
         </div>
 
         {/* Headline */}

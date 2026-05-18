@@ -13,9 +13,17 @@ export default function Footer() {
         </p>
       </div>
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="text-base font-bold">
-          <span className="text-gradient-teal">VESTRS</span>
-          <span className="text-slate-600 font-normal text-sm ml-3">
+        <div className="flex flex-col">
+          <span style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: '14px',
+            fontWeight: '400',
+            letterSpacing: '0.35em',
+            color: '#FFFFFF',
+          }}>
+            VESTRS
+          </span>
+          <span className="text-slate-600 font-normal text-sm mt-1">
             Built for global investors. Rooted in India.
           </span>
         </div>
