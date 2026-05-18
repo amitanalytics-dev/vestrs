@@ -136,7 +136,7 @@ export default function Proof() {
           className="text-center mb-4"
         >
           <span className="text-violet-400 text-xs font-bold tracking-[0.2em] uppercase">
-            The Returns
+            The Story
           </span>
         </motion.div>
 

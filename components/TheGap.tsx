@@ -10,7 +10,7 @@ const problems = [
     borderClass: 'border-l-4 border-red-400',
     labelClass: 'text-red-400',
     stat: '95% of rounds close offline.',
-    desc: 'Top deals live in WhatsApp groups and warm VC intros. Not AngelList.',
+    desc: 'Top deals live in WhatsApp groups and warm VC intros.',
     closer: 'Vestrs is already in those rooms. You plug straight in.',
   },
   {

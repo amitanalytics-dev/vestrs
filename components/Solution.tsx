@@ -14,7 +14,7 @@ const features = [
       </svg>
     ),
     title: 'Curated deal flow',
-    body: 'We review 300+ startups each quarter and surface only those with institutional-grade fundamentals, proven unit economics, and global expansion potential. No noise — just your next high-conviction bet.',
+    body: 'We review hundreds startups each quarter and surface only those with institutional-grade fundamentals, sound unit economics, and expansion potential. No noise — just your next high-conviction bet.',
   },
   {
     iconBg: 'bg-violet-500/10',
@@ -27,7 +27,7 @@ const features = [
       </svg>
     ),
     title: 'Cross-border compliance, fully handled',
-    body: 'FEMA, RBI approval layers, PFIC classification, FBAR reporting, tax treaty navigation, cap table structuring — all of it handled end-to-end. You sign off on the investment. We handle everything else.',
+    body: 'PFIC classification, FBAR reporting, Relevant IRS compliance, cap table structuring, RBI approval layers, FEMA guidelines — all handled end-to-end. You sign off on the investment. We handle everything else.',
   },
   {
     iconBg: 'bg-sky-500/10',
@@ -41,7 +41,7 @@ const features = [
       </svg>
     ),
     title: 'Institutional-grade access',
-    body: "First-access to pre-Series A and Series A rounds that India's top 10 VC firms see first. Now available to global angels and family offices — without needing a Mumbai office or a local GP relationship.",
+    body: "First-access to pre-seed, Seed, pre-Series A and Series A rounds that India's top VC firms see first. Now available to you on your fingertips — without needing a local GP relationship.",
   },
   {
     iconBg: 'bg-amber-500/10',
@@ -56,7 +56,7 @@ const features = [
       </svg>
     ),
     title: 'Founder-first network',
-    body: 'Direct video access to founders — ask them anything. No carry, no management fees, no fund structure. Vestrs is a platform for conviction-based investing, not an intermediary adding a layer between you and the deal.',
+    body: 'Direct access to founders — ask them anything. No fund style structure. Vestrs is a platform for conviction-based investing, not an intermediary adding a layer between you and the deal.',
   },
 ]
 
