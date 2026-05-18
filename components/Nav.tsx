@@ -24,6 +24,7 @@ export default function Nav() {
   }, [])
 
   return (
+    <>
     <motion.nav
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -156,5 +157,22 @@ export default function Nav() {
         )}
       </AnimatePresence>
     </motion.nav>
+
+      {/* Sticky mobile footer CTA */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-4 pb-5 pt-3"
+        style={{ background: 'linear-gradient(to top, #07101D 70%, transparent)' }}
+      >
+        <a
+          href="#waitlist"
+          onClick={(e) => {
+            e.preventDefault()
+            document.querySelector('#waitlist')?.scrollIntoView({ behavior: 'smooth' })
+          }}
+          className="block w-full text-center bg-gradient-to-r from-[#059669] to-[#0EA5E9] text-white text-sm font-bold py-4 rounded-xl shadow-lg shadow-black/40"
+        >
+          Join Waitlist
+        </a>
+      </div>
+    </>
   )
 }
