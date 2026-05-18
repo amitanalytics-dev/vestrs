@@ -40,7 +40,10 @@ export default function Nav() {
         <div className="flex flex-col flex-shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           <div
             className="px-4 py-2"
-            style={{ backgroundColor: '#131864' }}
+            style={{
+              backgroundColor: '#0A0F38',
+              border: '1px solid rgba(255,255,255,0.22)',
+            }}
           >
             <span style={{
               fontFamily: 'Georgia, "Times New Roman", serif',
